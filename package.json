@@ -30,7 +30,7 @@
         "@dnd-kit/utilities": "^3.2.2",
         "@types/tcp-ping": "^0.1.6",
         "bcryptjs": "^3.0.3",
-        "better-sqlite3": "^12.5.0",
+        "better-sqlite3": "^12.6.2",
         "clsx": "^2.1.1",
         "dockerode": "^4.0.9",
         "framer-motion": "^12.23.25",
