@@ -98,13 +98,17 @@ export default function SystemStatsWidget() {
                     <div className={styles.fill} style={{ width: `${(stats.memUsed / stats.memTotal) * 100}%` }} />
                 </div>
 
-                <div className={styles.memRow} style={{ marginTop: '0.5rem' }}>
-                    <span>Storage</span>
-                    <span className={styles.memValue}>{formatBytes(stats.storage[0].used)} / {formatBytes(stats.storage[0].size)}</span>
-                </div>
-                <div className={styles.progressBar}>
-                    <div className={styles.fill} style={{ width: `${(stats.storage[0].used / stats.storage[0].size) * 100}%`, opacity: 0.5 }} />
-                </div>
+                {stats.storage.length > 0 && (
+                    <>
+                        <div className={styles.memRow} style={{ marginTop: '0.5rem' }}>
+                            <span>Storage</span>
+                            <span className={styles.memValue}>{formatBytes(stats.storage[0].used)} / {formatBytes(stats.storage[0].size)}</span>
+                        </div>
+                        <div className={styles.progressBar}>
+                            <div className={styles.fill} style={{ width: `${(stats.storage[0].used / stats.storage[0].size) * 100}%`, opacity: 0.5 }} />
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );
