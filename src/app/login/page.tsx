@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 import { getSafeRedirectUrl } from '@/lib/redirect-utils';
 import styles from './page.module.css';
 
@@ -110,6 +111,7 @@ export default function LoginPage() {
         return (
             <div className={styles.container}>
                 <div className={styles.card}>
+                    <Image src="/atom-logo.png" alt="Atom" width={48} height={48} className={styles.logo} />
                     <p className={styles.subtitle}>Initializing...</p>
                 </div>
             </div>
@@ -119,6 +121,7 @@ export default function LoginPage() {
     return (
         <div className={styles.container}>
             <div className={styles.card}>
+                <Image src="/atom-logo.png" alt="Atom" width={48} height={48} className={styles.logo} />
                 <h1 className={styles.title}>Welcome Back</h1>
                 <p className={styles.subtitle}>Sign in to your Atom dashboard</p>
 
@@ -154,13 +157,10 @@ export default function LoginPage() {
                 </form>
 
                 {providers.length > 0 && (
-                    <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border-color)' }}>
-                        <div style={{ marginBottom: '1rem', textAlign: 'center', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                            Or continue with
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    <>
+                        <div className={styles.divider}>or</div>
+                        <div className={styles.providers}>
                             {providers.map(p => {
-                                // Preserve returnTo when using OAuth providers
                                 const providerUrl = returnTo
                                     ? `/api/auth/${p.slug}/login?returnTo=${encodeURIComponent(returnTo)}`
                                     : `/api/auth/${p.slug}/login`;
@@ -169,12 +169,7 @@ export default function LoginPage() {
                                     <button
                                         key={p.slug}
                                         type="button"
-                                        className={styles.button}
-                                        style={{
-                                            backgroundColor: 'var(--bg-secondary)',
-                                            color: 'var(--text-primary)',
-                                            border: '1px solid var(--border-color)'
-                                        }}
+                                        className={styles.providerButton}
                                         onClick={() => window.location.href = providerUrl}
                                     >
                                         Sign in with {p.name}
@@ -182,8 +177,10 @@ export default function LoginPage() {
                                 );
                             })}
                         </div>
-                    </div>
+                    </>
                 )}
+
+                <div className={styles.footer}>Powered by Atom</div>
             </div>
         </div>
     );

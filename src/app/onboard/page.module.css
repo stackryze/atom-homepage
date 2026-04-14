@@ -1,39 +1,124 @@
+/* ── Background ── */
 .container {
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    background: var(--bg-primary);
 }
 
+/* Animated gradient orbs */
+.container::before,
+.container::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.12;
+    pointer-events: none;
+    animation: orbFloat 14s ease-in-out infinite alternate;
+}
+
+.container::before {
+    width: 600px;
+    height: 600px;
+    background: var(--accent-color);
+    top: -15%;
+    left: -10%;
+}
+
+.container::after {
+    width: 500px;
+    height: 500px;
+    background: var(--accent-secondary);
+    bottom: -10%;
+    right: -10%;
+    animation-delay: -7s;
+    animation-direction: alternate-reverse;
+}
+
+@keyframes orbFloat {
+    0%   { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(60px, 40px) scale(1.15); }
+}
+
+/* ── Card ── */
 .card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
+    position: relative;
+    z-index: 1;
+    background: color-mix(in srgb, var(--bg-card) 80%, transparent);
+    backdrop-filter: blur(24px) saturate(1.4);
+    -webkit-backdrop-filter: blur(24px) saturate(1.4);
+    border: 1px solid color-mix(in srgb, var(--border-color) 60%, transparent);
     border-radius: var(--radius-lg);
-    padding: 2.5rem;
+    padding: 2.5rem 2.5rem 2rem;
     width: 100%;
-    max-width: 400px;
+    max-width: 420px;
     text-align: center;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25);
+    animation: cardEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+@keyframes cardEnter {
+    from { opacity: 0; transform: translateY(18px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ── Branding ── */
 .logo {
-    font-size: 3rem;
-    margin-bottom: 1rem;
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 1.25rem;
+    border-radius: 14px;
+    object-fit: cover;
+    animation: logoPulse 3s ease-in-out infinite;
+}
+
+@keyframes logoPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(212, 165, 116, 0.35); }
+    50%      { box-shadow: 0 0 0 8px rgba(212, 165, 116, 0); }
+}
+
+/* ── Step indicator ── */
+.stepIndicator {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.stepDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--border-color);
+    transition: background 0.3s, transform 0.3s;
+}
+
+.stepDotActive {
+    background: var(--accent-color);
+    transform: scale(1.25);
 }
 
 .title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 0.35rem;
     color: var(--text-primary);
+    letter-spacing: -0.02em;
 }
 
 .subtitle {
     color: var(--text-secondary);
-    font-size: 0.9rem;
-    margin-bottom: 2rem;
+    font-size: 0.88rem;
+    margin-bottom: 1.75rem;
+    line-height: 1.4;
 }
 
+/* ── Form ── */
 .form {
     display: flex;
     flex-direction: column;
@@ -43,13 +128,16 @@
 .inputGroup {
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
+    gap: 0.35rem;
     text-align: left;
 }
 
 .inputGroup label {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
+    font-weight: 500;
     color: var(--text-secondary);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
 }
 
 .inputGroup input {
@@ -58,46 +146,86 @@
     border: 1px solid var(--border-color);
     border-radius: var(--radius-sm);
     color: var(--text-primary);
-    font-size: 1rem;
+    font-size: 0.95rem;
     outline: none;
-    transition: border-color 0.2s;
+    transition: border-color 0.25s, box-shadow 0.25s;
 }
 
 .inputGroup input:focus {
     border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.15);
 }
 
+.inputGroup input::placeholder {
+    color: var(--text-muted);
+}
+
+/* ── Error ── */
 .error {
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.25);
     color: #ef4444;
-    padding: 0.75rem;
+    padding: 0.7rem 0.85rem;
     border-radius: var(--radius-sm);
-    font-size: 0.85rem;
+    font-size: 0.84rem;
+    text-align: left;
+    animation: shake 0.35s ease-in-out;
 }
 
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%      { transform: translateX(-4px); }
+    40%      { transform: translateX(4px); }
+    60%      { transform: translateX(-3px); }
+    80%      { transform: translateX(2px); }
+}
+
+/* ── Primary button ── */
 .button {
+    position: relative;
     background: var(--accent-color);
     color: #fff;
     border: none;
-    padding: 0.85rem 1.5rem;
+    padding: 0.8rem 1.5rem;
     border-radius: var(--radius-sm);
-    font-size: 1rem;
-    font-weight: 500;
+    font-size: 0.95rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: opacity 0.2s;
     margin-top: 0.5rem;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.button::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.25s;
 }
 
 .button:hover {
-    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(212, 165, 116, 0.4);
+}
+
+.button:hover::after {
+    opacity: 1;
+}
+
+.button:active {
+    transform: translateY(0);
 }
 
 .button:disabled {
-    opacity: 0.6;
+    opacity: 0.55;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
+/* ── Links ── */
 .link {
     margin-top: 1.5rem;
     font-size: 0.85rem;
@@ -107,8 +235,31 @@
 .link a {
     color: var(--accent-color);
     text-decoration: none;
+    font-weight: 500;
+    transition: opacity 0.2s;
 }
 
 .link a:hover {
-    text-decoration: underline;
+    opacity: 0.8;
+}
+
+/* ── Footer ── */
+.footer {
+    margin-top: 1.75rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid color-mix(in srgb, var(--border-color) 50%, transparent);
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+    .card {
+        padding: 2rem 1.5rem 1.5rem;
+        border-radius: var(--radius-md);
+    }
+
+    .container::before { width: 350px; height: 350px; }
+    .container::after  { width: 300px; height: 300px; }
 }

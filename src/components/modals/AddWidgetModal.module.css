@@ -4,7 +4,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
@@ -16,14 +16,14 @@
 .modal {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
     width: 95%;
     max-width: 800px;
     max-height: 85vh;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: var(--shadow-lg);
+    animation: modalEnter 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .header {
@@ -286,14 +286,14 @@
     }
 }
 
-@keyframes scaleUp {
+@keyframes modalEnter {
     from {
-        transform: scale(0.95);
+        transform: scale(0.96) translateY(8px);
         opacity: 0;
     }
 
     to {
-        transform: scale(1);
+        transform: scale(1) translateY(0);
         opacity: 1;
     }
 }

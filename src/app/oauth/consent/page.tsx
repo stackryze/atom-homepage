@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 import styles from './page.module.css';
 
 function ConsentContent() {
@@ -133,6 +134,7 @@ function ConsentContent() {
         return (
             <div className={styles.container}>
                 <div className={styles.card}>
+                    <Image src="/atom-logo.png" alt="Atom" width={48} height={48} className={styles.logo} />
                     <h1 className={styles.title}>Authorization Error</h1>
                     <div className={styles.error}>{error}</div>
                 </div>
@@ -143,6 +145,7 @@ function ConsentContent() {
     return (
         <div className={styles.container}>
             <div className={styles.card}>
+                <Image src="/atom-logo.png" alt="Atom" width={48} height={48} className={styles.logo} />
                 <h1 className={styles.title}>Authorize Application</h1>
 
                 {clientInfo && (
@@ -182,6 +185,8 @@ function ConsentContent() {
                                 {loading ? 'Authorizing...' : 'Allow'}
                             </button>
                         </div>
+
+                        <div className={styles.footer}>Powered by Atom</div>
                     </>
                 )}
             </div>

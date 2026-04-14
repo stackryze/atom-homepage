@@ -3,10 +3,10 @@
     align-items: center;
     gap: 0.6rem;
     background: var(--bg-card);
-    padding: 0.7rem 0.9rem;
-    border-radius: 10px;
+    padding: 0.65rem 0.85rem;
+    border-radius: var(--radius-sm);
     text-decoration: none;
-    transition: background-color 0.2s;
+    transition: background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
     border: 1px solid var(--border-color);
     min-width: 0;
     overflow: hidden;
@@ -15,11 +15,14 @@
 
 .card:hover {
     background: var(--bg-hover);
+    border-color: var(--border-accent);
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-1px);
 }
 
 .iconContainer {
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -28,8 +31,8 @@
 }
 
 .svgIcon {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     fill: var(--text-primary);
 }
 
@@ -47,16 +50,17 @@
 }
 
 .name {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     font-weight: 500;
     color: var(--text-primary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    letter-spacing: -0.01em;
 }
 
 .url {
-    font-size: 0.65rem;
+    font-size: 0.62rem;
     color: var(--text-muted);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -66,22 +70,23 @@
     gap: 0.15rem;
 }
 
-/* Compact mode - icon only */
+/* Compact mode */
 .card.compact {
-    padding: 0.6rem;
+    padding: 0.55rem;
     justify-content: center;
-    width: 44px;
-    height: 44px;
+    width: 42px;
+    height: 42px;
+    border-radius: var(--radius-sm);
 }
 
 .card.compact .iconContainer {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
 }
 
 .card.compact .svgIcon {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
 }
 
 /* Status Indicator */

@@ -4,8 +4,8 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(4px);
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -16,16 +16,15 @@
 .modal {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
-    border-top: 3px solid var(--accent-color);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-lg);
     width: 95%;
     max-width: 900px;
     max-height: 80vh;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
-    animation: slideUp 0.3s ease-out;
+    box-shadow: var(--shadow-lg);
+    animation: modalEnter 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .header {
@@ -37,15 +36,16 @@
 }
 
 .headerContent h2 {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     font-weight: 600;
     color: var(--text-primary);
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.2rem;
+    letter-spacing: -0.01em;
 }
 
 .subHeader {
-    color: var(--text-secondary);
-    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-size: 0.82rem;
 }
 
 .closeBtn {
@@ -121,9 +121,12 @@
     background: var(--bg-secondary);
     position: sticky;
     top: 0;
-    padding: 1rem;
-    color: var(--text-secondary);
+    padding: 0.75rem 1rem;
+    color: var(--text-muted);
     font-weight: 600;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     border-bottom: 1px solid var(--border-color);
     user-select: none;
     z-index: 10;
@@ -244,14 +247,14 @@
     }
 }
 
-@keyframes slideUp {
+@keyframes modalEnter {
     from {
-        transform: translateY(20px);
+        transform: scale(0.96) translateY(8px);
         opacity: 0;
     }
 
     to {
-        transform: translateY(0);
+        transform: scale(1) translateY(0);
         opacity: 1;
     }
 }
