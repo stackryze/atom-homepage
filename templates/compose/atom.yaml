@@ -1,5 +1,6 @@
 # documentation: https://github.com/stackryze/atom-homepage
 # slogan: A modern, self-hosted dashboard for monitoring services, Docker containers, and system resources.
+# category: productivity
 # tags: dashboard,monitoring,docker,self-hosted,homepage,status,widgets
 # logo: svgs/atom.svg
 # port: 3000
