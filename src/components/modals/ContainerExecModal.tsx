@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import { X, AlertCircle } from 'lucide-react';
 import styles from './ContainerExecModal.module.css';
 import { createPortal } from 'react-dom';
-import type { Terminal } from 'xterm';
-import type { FitAddon } from 'xterm-addon-fit';
+import type { Terminal } from '@xterm/xterm';
+import type { FitAddon } from '@xterm/addon-fit';
 
 interface Props {
     containerId: string;
@@ -32,10 +32,10 @@ export default function ContainerExecModal({ containerId, containerName, onClose
         const abortController = new AbortController();
 
         // Dynamically import xterm to avoid SSR issues
-        import('xterm').then(async ({ Terminal }) => {
+        import('@xterm/xterm').then(async ({ Terminal }) => {
             if (!isTerminalMounted || !terminalRef.current) return;
 
-            const { FitAddon } = await import('xterm-addon-fit');
+            const { FitAddon } = await import('@xterm/addon-fit');
 
             const term = new Terminal({
                 cursorBlink: true,
