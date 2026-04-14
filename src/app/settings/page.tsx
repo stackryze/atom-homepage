@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Save, Upload, Download, Plus, Sun, Moon, Code, X, Lock, LogOut } from 'lucide-react';
+import { ArrowLeft, Save, Upload, Download, Plus, Sun, Moon, Code, X, Lock, LogOut, Palette } from 'lucide-react';
 import { toast } from 'sonner';
 import { Service, Link as AppLink, Widget } from '@/types';
 import { useTheme } from '@/context/ThemeContext';
@@ -26,6 +26,9 @@ export default function SettingsPage() {
     const [localTitle, setLocalTitle] = useState('');
     const [localLocation, setLocalLocation] = useState('');
     const [activeSection, setActiveSection] = useState('general');
+    const [customCss, setCustomCss] = useState('');
+    const [bulkImportText, setBulkImportText] = useState('');
+    const [bulkFormat, setBulkFormat] = useState<'json' | 'csv'>('csv');
 
     // Role protection
     const [loading, setLoading] = useState(true);
@@ -399,6 +402,94 @@ export default function SettingsPage() {
                         />
                     </section>
                 );
+            case 'pages':
+                return (
+                    <section className={styles.section}>
+                        <h2 className={styles.sectionTitle}>Dashboard Pages</h2>
+                        <p className={styles.sectionDesc}>
+                            Create pages to organize your services into tabs on the dashboard.
+                        </p>
+
+                        {(config?.pages || []).map((page, index) => (
+                            <div key={page.id} className={styles.controlRow} style={{ flexDirection: 'column', alignItems: 'stretch', gap: '0.75rem', padding: '1rem', background: 'var(--bg-secondary)', borderRadius: 'var(--radius)', marginBottom: '0.75rem' }}>
+                                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                    <input
+                                        className={styles.input}
+                                        value={page.name}
+                                        onChange={(e) => {
+                                            if (!config) return;
+                                            const pages = [...(config.pages || [])];
+                                            pages[index] = { ...pages[index], name: e.target.value };
+                                            updateConfig({ ...config, pages });
+                                        }}
+                                        placeholder="Page name"
+                                        style={{ flex: 1 }}
+                                    />
+                                    <button
+                                        className={styles.btnSecondary}
+                                        onClick={() => {
+                                            if (!config) return;
+                                            const pages = (config.pages || []).filter(p => p.id !== page.id);
+                                            updateConfig({ ...config, pages });
+                                            toast.success('Page deleted');
+                                        }}
+                                        style={{ color: '#ef4444', padding: '0.5rem' }}
+                                    >
+                                        <X size={16} />
+                                    </button>
+                                </div>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
+                                    {config?.services.map(service => {
+                                        const isAssigned = page.services.includes(service.id);
+                                        return (
+                                            <button
+                                                key={service.id}
+                                                onClick={() => {
+                                                    if (!config) return;
+                                                    const pages = [...(config.pages || [])];
+                                                    const newServices = isAssigned
+                                                        ? page.services.filter(id => id !== service.id)
+                                                        : [...page.services, service.id];
+                                                    pages[index] = { ...pages[index], services: newServices };
+                                                    updateConfig({ ...config, pages });
+                                                }}
+                                                style={{
+                                                    padding: '4px 10px',
+                                                    fontSize: '0.75rem',
+                                                    borderRadius: '6px',
+                                                    border: isAssigned ? '1px solid var(--accent-color)' : '1px solid var(--border-color)',
+                                                    background: isAssigned ? 'var(--accent-color)' : 'transparent',
+                                                    color: isAssigned ? '#fff' : 'var(--text-secondary)',
+                                                    textShadow: isAssigned ? '0 1px 2px rgba(0,0,0,0.5)' : 'none',
+                                                    cursor: 'pointer',
+                                                    transition: 'all 0.15s ease',
+                                                }}
+                                            >
+                                                {service.name}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        ))}
+
+                        <button
+                            className={styles.btnPrimary}
+                            onClick={() => {
+                                if (!config) return;
+                                const newPage = {
+                                    id: `page-${Date.now()}`,
+                                    name: `Page ${(config.pages?.length || 0) + 1}`,
+                                    services: [],
+                                };
+                                updateConfig({ ...config, pages: [...(config.pages || []), newPage] });
+                                toast.success('Page created');
+                            }}
+                        >
+                            <Plus size={16} /> Add Page
+                        </button>
+                    </section>
+                );
             case 'users':
                 return (
                     <section className={styles.section}>
@@ -457,6 +548,199 @@ export default function SettingsPage() {
                         <div style={{ padding: '0 0.5rem' }}>
                             <AuthProviderManager />
                         </div>
+                    </section>
+                );
+            case 'appearance':
+                return (
+                    <section className={styles.section}>
+                        <h2 className={styles.sectionTitle}>Appearance</h2>
+                        <p className={styles.sectionDesc}>Customize colors and add custom CSS.</p>
+
+                        <div className={styles.controlRow}>
+                            <label>Primary Color</label>
+                            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                <input
+                                    type="color"
+                                    value={config?.theme?.primaryColor || '#d4a574'}
+                                    onChange={(e) => {
+                                        if (config) updateConfig({ ...config, theme: { ...config.theme, primaryColor: e.target.value } });
+                                    }}
+                                    style={{ width: '40px', height: '32px', border: 'none', cursor: 'pointer', background: 'none' }}
+                                />
+                                <input
+                                    className={styles.input}
+                                    value={config?.theme?.primaryColor || '#d4a574'}
+                                    onChange={(e) => {
+                                        if (config && /^#[0-9a-fA-F]{6}$/.test(e.target.value)) {
+                                            updateConfig({ ...config, theme: { ...config.theme, primaryColor: e.target.value } });
+                                        }
+                                    }}
+                                    placeholder="#d4a574"
+                                    style={{ width: '100px' }}
+                                />
+                            </div>
+                        </div>
+
+                        <div className={styles.controlRow}>
+                            <label>Background Color <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>(dark mode only)</span></label>
+                            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                <input
+                                    type="color"
+                                    value={config?.theme?.backgroundColor || '#0a0a0a'}
+                                    onChange={(e) => {
+                                        if (config) updateConfig({ ...config, theme: { ...config.theme, backgroundColor: e.target.value } });
+                                    }}
+                                    style={{ width: '40px', height: '32px', border: 'none', cursor: 'pointer', background: 'none' }}
+                                />
+                                <input
+                                    className={styles.input}
+                                    value={config?.theme?.backgroundColor || '#0a0a0a'}
+                                    onChange={(e) => {
+                                        if (config && /^#[0-9a-fA-F]{6}$/.test(e.target.value)) {
+                                            updateConfig({ ...config, theme: { ...config.theme, backgroundColor: e.target.value } });
+                                        }
+                                    }}
+                                    placeholder="#0a0a0a"
+                                    style={{ width: '100px' }}
+                                />
+                            </div>
+                        </div>
+
+                        <div className={styles.controlRow}>
+                            <label>Background Image URL</label>
+                            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                <input
+                                    className={styles.input}
+                                    value={config?.theme?.backgroundImage || ''}
+                                    onChange={(e) => {
+                                        if (config) updateConfig({ ...config, theme: { ...config.theme, backgroundImage: e.target.value } });
+                                    }}
+                                    placeholder="https://example.com/bg.jpg"
+                                    style={{ flex: 1 }}
+                                />
+                            </div>
+                        </div>
+
+                        <div className={styles.controlRow} style={{ flexDirection: 'column', alignItems: 'stretch', gap: '0.5rem' }}>
+                            <label><Palette size={14} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '0.35rem' }} />Custom CSS</label>
+                            <textarea
+                                className={styles.input}
+                                value={customCss}
+                                onChange={(e) => setCustomCss(e.target.value)}
+                                placeholder={`:root {\n  --accent: #e06c75;\n  --bg-card: rgba(30, 30, 30, 0.5);\n}\n\n/* Custom overrides */`}
+                                style={{ minHeight: '200px', fontFamily: 'monospace', fontSize: '0.8rem', lineHeight: '1.5', whiteSpace: 'pre' }}
+                            />
+                            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                                Add custom CSS variables or overrides. Changes apply to the entire dashboard.
+                            </span>
+                        </div>
+
+                        <h3 style={{ margin: '1.5rem 0 0.75rem', fontSize: '0.9rem' }}>Quick Themes</h3>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '0.5rem' }}>
+                            {(theme === 'dark' ? [
+                                { name: 'Warm', primary: '#d4a574', bg: '#0a0a0a' },
+                                { name: 'Ocean', primary: '#4ecdc4', bg: '#0a1628' },
+                                { name: 'Rose', primary: '#e06c75', bg: '#1a0a0e' },
+                                { name: 'Emerald', primary: '#10b981', bg: '#0a1a14' },
+                                { name: 'Purple', primary: '#a78bfa', bg: '#120a24' },
+                                { name: 'Sunset', primary: '#f97316', bg: '#1a0f05' },
+                                { name: 'Nord', primary: '#88c0d0', bg: '#2e3440' },
+                                { name: 'Dracula', primary: '#bd93f9', bg: '#282a36' },
+                            ] : [
+                                { name: 'Warm', primary: '#8b6b43', bg: '#f5f5f3' },
+                                { name: 'Ocean', primary: '#0d9488', bg: '#f0f9ff' },
+                                { name: 'Rose', primary: '#be123c', bg: '#fff1f2' },
+                                { name: 'Emerald', primary: '#059669', bg: '#f0fdf4' },
+                                { name: 'Purple', primary: '#7c3aed', bg: '#f5f3ff' },
+                                { name: 'Sunset', primary: '#c2410c', bg: '#fff7ed' },
+                                { name: 'Nord', primary: '#5e81ac', bg: '#eceff4' },
+                                { name: 'Slate', primary: '#475569', bg: '#f8fafc' },
+                            ]).map(t => (
+                                <button
+                                    key={t.name}
+                                    onClick={() => {
+                                        if (config) updateConfig({ ...config, theme: { ...config.theme, primaryColor: t.primary, backgroundColor: t.bg } });
+                                        toast.success(`${t.name} theme applied`);
+                                    }}
+                                    style={{
+                                        padding: '0.6rem',
+                                        borderRadius: 'var(--radius)',
+                                        border: '1px solid var(--border-color)',
+                                        background: t.bg,
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        gap: '0.35rem',
+                                    }}
+                                >
+                                    <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: t.primary }} />
+                                    <span style={{ fontSize: '0.7rem', color: t.primary }}>{t.name}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </section>
+                );
+            case 'import':
+                return (
+                    <section className={styles.section}>
+                        <h2 className={styles.sectionTitle}>Bulk Import Services</h2>
+                        <p className={styles.sectionDesc}>Import multiple services at once from CSV or JSON.</p>
+
+                        <div className={styles.controlRow}>
+                            <label>Format</label>
+                            <select className={styles.select} value={bulkFormat} onChange={(e) => setBulkFormat(e.target.value as 'json' | 'csv')}>
+                                <option value="csv">CSV</option>
+                                <option value="json">JSON</option>
+                            </select>
+                        </div>
+
+                        <div className={styles.controlRow} style={{ flexDirection: 'column', alignItems: 'stretch', gap: '0.5rem' }}>
+                            <label>Paste Data</label>
+                            <textarea
+                                className={styles.input}
+                                value={bulkImportText}
+                                onChange={(e) => setBulkImportText(e.target.value)}
+                                placeholder={bulkFormat === 'csv'
+                                    ? 'name,url,icon,category,description\nGitea,https://git.example.com,gitea,Dev,Self-hosted Git\nJellyfin,https://media.example.com,jellyfin,Media,Media server'
+                                    : '[\n  {"name": "Gitea", "url": "https://git.example.com", "icon": "gitea"},\n  {"name": "Jellyfin", "url": "https://media.example.com", "icon": "jellyfin"}\n]'
+                                }
+                                style={{ minHeight: '200px', fontFamily: 'monospace', fontSize: '0.8rem' }}
+                            />
+                        </div>
+
+                        <button
+                            className={styles.btnPrimary}
+                            onClick={async () => {
+                                if (!bulkImportText.trim() || !config) return;
+                                try {
+                                    const res = await fetch('/api/services/bulk', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ format: bulkFormat, data: bulkImportText }),
+                                    });
+                                    const result = await res.json();
+                                    if (!res.ok) {
+                                        toast.error(result.error || 'Import failed');
+                                        return;
+                                    }
+                                    if (result.services.length > 0) {
+                                        const newServices = [...config.services, ...result.services];
+                                        updateConfig({ ...config, services: newServices });
+                                        toast.success(`Imported ${result.imported} services`);
+                                        setBulkImportText('');
+                                    }
+                                    if (result.errors.length > 0) {
+                                        result.errors.forEach((err: string) => toast.error(err));
+                                    }
+                                } catch {
+                                    toast.error('Import failed');
+                                }
+                            }}
+                            disabled={!bulkImportText.trim()}
+                        >
+                            <Upload size={16} /> Import Services
+                        </button>
                     </section>
                 );
             case 'backup':
@@ -533,6 +817,9 @@ export default function SettingsPage() {
                     <div className={`${styles.navItem} ${activeSection === 'widgets' ? styles.active : ''}`} onClick={() => setActiveSection('widgets')}>
                         Widgets
                     </div>
+                    <div className={`${styles.navItem} ${activeSection === 'pages' ? styles.active : ''}`} onClick={() => setActiveSection('pages')}>
+                        Pages
+                    </div>
                     <div className={styles.navSectionTitle}>Access & Security</div>
                     <div className={`${styles.navItem} ${activeSection === 'users' ? styles.active : ''}`} onClick={() => setActiveSection('users')}>
                         Users
@@ -544,6 +831,12 @@ export default function SettingsPage() {
                         External Login
                     </div>
                     <div className={styles.navSectionTitle}>System</div>
+                    <div className={`${styles.navItem} ${activeSection === 'appearance' ? styles.active : ''}`} onClick={() => setActiveSection('appearance')}>
+                        Appearance
+                    </div>
+                    <div className={`${styles.navItem} ${activeSection === 'import' ? styles.active : ''}`} onClick={() => setActiveSection('import')}>
+                        Bulk Import
+                    </div>
                     <div className={`${styles.navItem} ${activeSection === 'backup' ? styles.active : ''}`} onClick={() => setActiveSection('backup')}>
                         Data & Backup
                     </div>

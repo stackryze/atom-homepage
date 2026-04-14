@@ -5,6 +5,7 @@ import { Sun, Moon, Settings, LogOut, Keyboard, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import styles from '../Dashboard.module.css';
+import NotificationCenter from '../features/NotificationCenter';
 
 interface ClockWidgetProps {
     className?: string;
@@ -86,6 +87,7 @@ export default function ClockWidget({ weatherLocation, onShowShortcuts, onRefres
 
             <div className={styles.widgetControls}>
                 {customAction}
+                <NotificationCenter />
                 <button
                     onClick={onRefresh}
                     className={styles.settingsBtn}

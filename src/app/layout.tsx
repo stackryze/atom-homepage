@@ -12,6 +12,13 @@ const geist = Geist({
 export const metadata: Metadata = {
   title: "Atom",
   description: "Your Self-Hosted Start Page",
+  manifest: "/manifest.json",
+  themeColor: "#d4a574",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Atom",
+  },
 };
 
 import { StatusProvider } from '@/context/StatusContext';

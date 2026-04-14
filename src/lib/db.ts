@@ -176,6 +176,28 @@ try {
     } else {
         console.warn('Federated Auth schema file not found');
     }
+
+    // Load Features schema (uptime history, activity log, notes)
+    const featuresPossiblePaths = [
+        path.join(process.cwd(), 'src', 'lib', 'schema_features.sql'),
+        path.join(process.cwd(), 'schema_features.sql'),
+        path.join(__dirname, 'schema_features.sql'),
+    ];
+
+    let featuresSchemaPath: string | null = null;
+    for (const testPath of featuresPossiblePaths) {
+        if (fs.existsSync(testPath)) {
+            featuresSchemaPath = testPath;
+            break;
+        }
+    }
+
+    if (featuresSchemaPath) {
+        const featuresSchema = fs.readFileSync(featuresSchemaPath, 'utf8');
+        db.exec(featuresSchema);
+    } else {
+        console.warn('Features schema file not found - uptime history, notes will not be available');
+    }
 } catch (error) {
     console.error('Failed to initialize database schema:', error);
     // Re-throw in production to fail fast, but allow dev to continue
@@ -396,6 +418,190 @@ export function saveConfig(config: object): void {
 export function hasConfig(): boolean {
     const row = getStmt('SELECT id FROM config WHERE id = 1').get();
     return !!row;
+}
+
+// ============================================================================
+// Uptime History Operations
+// ============================================================================
+
+export interface UptimeRecord {
+    id: number;
+    service_id: string;
+    status: 'up' | 'down' | 'slow';
+    response_code: number;
+    latency: number;
+    checked_at: string;
+}
+
+export function recordUptime(serviceId: string, status: 'up' | 'down' | 'slow', responseCode: number, latency: number): void {
+    try {
+        getStmt('INSERT INTO uptime_history (service_id, status, response_code, latency) VALUES (?, ?, ?, ?)')
+            .run(serviceId, status, responseCode, latency);
+    } catch {
+        // Table may not exist
+    }
+}
+
+export function getUptimeHistory(serviceId: string, hours: number = 24): UptimeRecord[] {
+    try {
+        return getStmt(
+            `SELECT * FROM uptime_history WHERE service_id = ? AND checked_at >= datetime('now', '-' || ? || ' hours') ORDER BY checked_at ASC`
+        ).all(serviceId, hours) as UptimeRecord[];
+    } catch {
+        return [];
+    }
+}
+
+export function getUptimeSummary(serviceId: string, hours: number = 24): { uptime_percent: number; avg_latency: number; total_checks: number } {
+    try {
+        const result = getStmt(`
+            SELECT 
+                COUNT(*) as total,
+                SUM(CASE WHEN status = 'up' OR status = 'slow' THEN 1 ELSE 0 END) as up_count,
+                AVG(latency) as avg_latency
+            FROM uptime_history 
+            WHERE service_id = ? AND checked_at >= datetime('now', '-' || ? || ' hours')
+        `).get(serviceId, hours) as { total: number; up_count: number; avg_latency: number } | undefined;
+
+        if (!result || result.total === 0) {
+            return { uptime_percent: 100, avg_latency: 0, total_checks: 0 };
+        }
+
+        return {
+            uptime_percent: Math.round((result.up_count / result.total) * 10000) / 100,
+            avg_latency: Math.round(result.avg_latency || 0),
+            total_checks: result.total,
+        };
+    } catch {
+        return { uptime_percent: 100, avg_latency: 0, total_checks: 0 };
+    }
+}
+
+export function getAllUptimeSummaries(hours: number = 24): Record<string, { uptime_percent: number; avg_latency: number; total_checks: number }> {
+    try {
+        const rows = getStmt(`
+            SELECT 
+                service_id,
+                COUNT(*) as total,
+                SUM(CASE WHEN status = 'up' OR status = 'slow' THEN 1 ELSE 0 END) as up_count,
+                AVG(latency) as avg_latency
+            FROM uptime_history 
+            WHERE checked_at >= datetime('now', '-' || ? || ' hours')
+            GROUP BY service_id
+        `).all(hours) as { service_id: string; total: number; up_count: number; avg_latency: number }[];
+
+        const result: Record<string, { uptime_percent: number; avg_latency: number; total_checks: number }> = {};
+        for (const row of rows) {
+            result[row.service_id] = {
+                uptime_percent: Math.round((row.up_count / row.total) * 10000) / 100,
+                avg_latency: Math.round(row.avg_latency || 0),
+                total_checks: row.total,
+            };
+        }
+        return result;
+    } catch {
+        return {};
+    }
+}
+
+export function cleanupOldUptime(days: number = 30): void {
+    try {
+        getStmt("DELETE FROM uptime_history WHERE checked_at < datetime('now', '-' || ? || ' days')").run(days);
+    } catch {
+        // ignore
+    }
+}
+
+// ============================================================================
+// Activity Log Operations
+// ============================================================================
+
+export interface ActivityRecord {
+    id: number;
+    user_id: number | null;
+    username: string | null;
+    action: string;
+    target: string | null;
+    details: string | null;
+    ip_address: string | null;
+    created_at: string;
+}
+
+export function logActivity(userId: number | null, username: string | null, action: string, target?: string, details?: string, ipAddress?: string): void {
+    try {
+        getStmt('INSERT INTO activity_log (user_id, username, action, target, details, ip_address) VALUES (?, ?, ?, ?, ?, ?)')
+            .run(userId, username, action, target || null, details || null, ipAddress || null);
+    } catch {
+        // Table may not exist
+    }
+}
+
+export function getActivityLog(limit: number = 50, offset: number = 0): ActivityRecord[] {
+    try {
+        return getStmt('SELECT * FROM activity_log ORDER BY created_at DESC LIMIT ? OFFSET ?')
+            .all(limit, offset) as ActivityRecord[];
+    } catch {
+        return [];
+    }
+}
+
+// ============================================================================
+// Notes Operations
+// ============================================================================
+
+export interface NoteRecord {
+    id: number;
+    user_id: number;
+    content: string;
+    color: string;
+    pinned: number;
+    created_at: string;
+    updated_at: string;
+}
+
+export function getNotes(userId: number): NoteRecord[] {
+    try {
+        return getStmt('SELECT * FROM notes WHERE user_id = ? ORDER BY pinned DESC, updated_at DESC')
+            .all(userId) as NoteRecord[];
+    } catch {
+        return [];
+    }
+}
+
+export function createNote(userId: number, content: string, color: string = 'default'): NoteRecord | null {
+    try {
+        const result = getStmt('INSERT INTO notes (user_id, content, color) VALUES (?, ?, ?)').run(userId, content, color);
+        return getStmt('SELECT * FROM notes WHERE id = ?').get(result.lastInsertRowid as number) as NoteRecord;
+    } catch {
+        return null;
+    }
+}
+
+export function updateNote(noteId: number, userId: number, content: string, color?: string, pinned?: boolean): boolean {
+    try {
+        if (color !== undefined && pinned !== undefined) {
+            getStmt("UPDATE notes SET content = ?, color = ?, pinned = ?, updated_at = datetime('now') WHERE id = ? AND user_id = ?")
+                .run(content, color, pinned ? 1 : 0, noteId, userId);
+        } else if (color !== undefined) {
+            getStmt("UPDATE notes SET content = ?, color = ?, updated_at = datetime('now') WHERE id = ? AND user_id = ?")
+                .run(content, color, noteId, userId);
+        } else {
+            getStmt("UPDATE notes SET content = ?, updated_at = datetime('now') WHERE id = ? AND user_id = ?")
+                .run(content, noteId, userId);
+        }
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+export function deleteNote(noteId: number, userId: number): boolean {
+    try {
+        const result = getStmt('DELETE FROM notes WHERE id = ? AND user_id = ?').run(noteId, userId);
+        return result.changes > 0;
+    } catch {
+        return false;
+    }
 }
 
 export default db;

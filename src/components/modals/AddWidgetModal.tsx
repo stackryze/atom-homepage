@@ -39,6 +39,13 @@ export default function AddWidgetModal({ onClose, onSave, initialData }: AddWidg
     const [testData, setTestData] = useState<string | null>(null);
     const [testingEndpoint, setTestingEndpoint] = useState(false);
 
+    // Iframe options
+    const [iframeUrl, setIframeUrl] = useState((initialData?.options?.url as string) || '');
+    const [iframeHeight, setIframeHeight] = useState((initialData?.options?.height as number) || 300);
+
+    // Search options
+    const [searchEngine, setSearchEngine] = useState((initialData?.options?.engine as string) || 'google');
+
     // Initialize raw JSON when entering mode - intentionally triggered by isJsonMode only
     useEffect(() => {
         if (isJsonMode) {
@@ -86,9 +93,16 @@ export default function AddWidgetModal({ onClose, onSave, initialData }: AddWidg
     useEffect(() => {
         if (!initialData && !title && !isJsonMode) {
             if (type === 'system-monitor') setTitle('System Monitor');
+            if (type === 'notes') setTitle('Quick Notes');
+            if (type === 'uptime') setTitle('Uptime Monitor');
             if (type === 'docker') setTitle('Docker Stats');
             if (type === 'clock') setTitle('Clock');
             if (type === 'weather') setTitle('Weather');
+            if (type === 'search') setTitle('Search');
+            if (type === 'iframe') setTitle('Embed');
+            if (type === 'activity') setTitle('Activity Log');
+            if (type === 'calendar') setTitle('Calendar');
+            if (type === 'bookmarks') setTitle('Bookmarks');
         }
     }, [type, initialData, title, isJsonMode]);
 
@@ -209,6 +223,14 @@ export default function AddWidgetModal({ onClose, onSave, initialData }: AddWidg
                     styles: stylesValue,
                     script: scriptValue
                 };
+            } else if (type === 'iframe') {
+                if (!iframeUrl) {
+                    toast.error('Embed URL is required');
+                    return;
+                }
+                newWidget.options = { url: iframeUrl, height: iframeHeight };
+            } else if (type === 'search') {
+                newWidget.options = { engine: searchEngine };
             }
             finalWidget = newWidget;
         }
@@ -260,7 +282,14 @@ export default function AddWidgetModal({ onClose, onSave, initialData }: AddWidg
                                     <option value="system-monitor">System Monitor</option>
                                     <option value="docker">Docker Stats</option>
                                     <option value="clock">Clock & Weather</option>
-                                    <option value="weather">Weather Only</option>
+                                    <option value="weather">Weather</option>
+                                    <option value="notes">Quick Notes</option>
+                                    <option value="uptime">Uptime Monitor</option>
+                                    <option value="search">Search Engine</option>
+                                    <option value="iframe">Embed / Iframe</option>
+                                    <option value="activity">Activity Log</option>
+                                    <option value="calendar">Calendar</option>
+                                    <option value="bookmarks">Bookmarks</option>
                                 </select>
                             </div>
 
@@ -420,6 +449,47 @@ export default function AddWidgetModal({ onClose, onSave, initialData }: AddWidg
                                         <span className={styles.hint}>Optional JavaScript to run when data loads. Available: data (JSON), element (widget DOM).</span>
                                     </div>
                                 </>
+                            )}
+
+                            {type === 'iframe' && (
+                                <>
+                                    <div className={styles.field}>
+                                        <label>Embed URL</label>
+                                        <input
+                                            placeholder="https://example.com/embed"
+                                            value={iframeUrl}
+                                            onChange={(e) => setIframeUrl(e.target.value)}
+                                        />
+                                        <span className={styles.hint}>URL to embed. Must be http:// or https://. Site must allow embedding.</span>
+                                    </div>
+                                    <div className={styles.field}>
+                                        <label>Height (px)</label>
+                                        <input
+                                            type="number"
+                                            min={100}
+                                            max={1000}
+                                            value={iframeHeight}
+                                            onChange={(e) => setIframeHeight(Number(e.target.value))}
+                                        />
+                                    </div>
+                                </>
+                            )}
+
+                            {type === 'search' && (
+                                <div className={styles.field}>
+                                    <label>Default Search Engine</label>
+                                    <select value={searchEngine} onChange={(e) => setSearchEngine(e.target.value)}>
+                                        <option value="google">Google</option>
+                                        <option value="duckduckgo">DuckDuckGo</option>
+                                        <option value="bing">Bing</option>
+                                        <option value="brave">Brave</option>
+                                        <option value="youtube">YouTube</option>
+                                        <option value="github">GitHub</option>
+                                        <option value="reddit">Reddit</option>
+                                        <option value="stackoverflow">Stack Overflow</option>
+                                    </select>
+                                    <span className={styles.hint}>Users can switch engines from the widget.</span>
+                                </div>
                             )}
                         </>
                     )}

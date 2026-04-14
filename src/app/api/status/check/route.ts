@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkServiceStatus } from '@/lib/status-checker';
 import { getCurrentUser } from '@/lib/auth';
+import { recordUptime } from '@/lib/db';
 import { z } from 'zod';
 
 const urlSchema = z.string().url('Invalid URL format');
@@ -29,6 +30,12 @@ export async function GET(request: NextRequest) {
 
     try {
         const result = await checkServiceStatus(validationResult.data);
+
+        // Record uptime history
+        const serviceId = searchParams.get('id') || validationResult.data;
+        const status = result.up ? (result.latency > 500 ? 'slow' : 'up') : 'down';
+        recordUptime(serviceId, status as 'up' | 'down' | 'slow', result.status, result.latency);
+
         return NextResponse.json(result);
     } catch (error) {
         console.error('Status check error:', error);

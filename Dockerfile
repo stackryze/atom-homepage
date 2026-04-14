@@ -37,6 +37,7 @@ COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/src/lib/schema.sql ./src/lib/schema.sql
 COPY --from=builder /app/src/lib/schema_oauth.sql ./src/lib/schema_oauth.sql
 COPY --from=builder /app/src/lib/schema_federated.sql ./src/lib/schema_federated.sql
+COPY --from=builder /app/src/lib/schema_features.sql ./src/lib/schema_features.sql
 
 RUN mkdir -p /app/data && chmod 700 /app/data
 

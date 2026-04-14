@@ -78,11 +78,17 @@ export const appConfigSchema = z.object({
     }).optional(),
     widgets: z.array(z.object({
         id: z.string(),
-        type: z.enum(['system-monitor', 'weather', 'clock', 'generic', 'docker', 'custom']),
+        type: z.enum(['system-monitor', 'weather', 'clock', 'generic', 'docker', 'custom', 'notes', 'uptime', 'iframe', 'search', 'activity', 'calendar', 'bookmarks']),
         title: z.string().optional(),
         column: z.enum(['left', 'right']).optional(),
         enabled: z.boolean().optional(),
         options: z.record(z.string(), z.any()).optional(),
+    })).optional(),
+    pages: z.array(z.object({
+        id: z.string(),
+        name: z.string().min(1),
+        icon: z.string().optional(),
+        services: z.array(z.string()),
     })).optional(),
 });
 

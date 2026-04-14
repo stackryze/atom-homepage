@@ -75,7 +75,15 @@ export default function ServiceCard({ service, compact = false }: ServiceCardPro
                 <div className={styles.info}>
                     <div className={styles.nameRow}>
                         <span className={styles.name}>{service.name}</span>
+                        {!isActuallyLoading && status.state !== 'loading' && status.latency > 0 && service.category !== 'Bookmark' && (
+                            <span className={`${styles.latency} ${status.state === 'slow' ? styles.latencySlow : ''}`}>
+                                {status.latency}ms
+                            </span>
+                        )}
                     </div>
+                    {service.description && (
+                        <div className={styles.description}>{service.description}</div>
+                    )}
                     <div className={styles.url}>
                         {(status.state === 'down' && status.code > 0) ? (
                             <span className={styles.errorCode}>Err {status.code}</span>

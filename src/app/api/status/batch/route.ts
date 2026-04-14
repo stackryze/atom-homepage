@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkServiceStatus, StatusResult } from '@/lib/status-checker';
 import { getCurrentUser } from '@/lib/auth';
+import { recordUptime } from '@/lib/db';
 import { z } from 'zod';
 
 const batchRequestSchema = z.object({
@@ -55,6 +56,9 @@ export async function POST(request: NextRequest) {
         const resultMap: Record<string, StatusResult> = {};
         results.forEach(({ url, result }) => {
             resultMap[url] = result;
+            // Record uptime history
+            const status = result.up ? (result.latency > 500 ? 'slow' : 'up') : 'down';
+            recordUptime(url, status as 'up' | 'down' | 'slow', result.status, result.latency);
         });
 
         return NextResponse.json({ results: resultMap });

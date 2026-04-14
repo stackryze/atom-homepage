@@ -50,11 +50,19 @@ export interface AppConfig {
         long?: number;
     };
     widgets?: Widget[];
+    pages?: DashboardPage[];
+}
+
+export interface DashboardPage {
+    id: string;
+    name: string;
+    icon?: string;
+    services: string[]; // Service IDs assigned to this page
 }
 
 export interface Widget {
     id: string;
-    type: 'system-monitor' | 'weather' | 'clock' | 'generic' | 'docker' | 'custom'; // Add more types later
+    type: 'system-monitor' | 'weather' | 'clock' | 'generic' | 'docker' | 'custom' | 'notes' | 'uptime' | 'iframe' | 'search' | 'activity' | 'calendar' | 'bookmarks';
     title?: string;
     column?: 'left' | 'right';
     enabled?: boolean; // Default true

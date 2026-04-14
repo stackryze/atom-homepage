@@ -1,0 +1,165 @@
+.wrapper {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+}
+
+.header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.backBtn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 0.8rem;
+    transition: all 0.15s ease;
+}
+
+.backBtn:hover {
+    background: var(--bg-hover);
+}
+
+.summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+}
+
+.summaryCard {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 1rem;
+    text-align: center;
+}
+
+.summaryValue {
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.summaryLabel {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+}
+
+.serviceList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.serviceRow {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    transition: background 0.1s ease;
+}
+
+.serviceRow:hover {
+    background: var(--bg-hover);
+}
+
+.serviceInfo {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+}
+
+.serviceName {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.serviceUrl {
+    font-size: 0.65rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.statusBadge {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+}
+
+.statusUp {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+
+.statusDown {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+}
+
+.statusSlow {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+}
+
+.statusLoading {
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+}
+
+.latencyValue {
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-secondary);
+    width: 60px;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.uptimeBar {
+    display: flex;
+    gap: 1px;
+    height: 20px;
+    flex-shrink: 0;
+    width: 120px;
+}
+
+.uptimeSegment {
+    flex: 1;
+    border-radius: 2px;
+    min-width: 2px;
+}
+
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
