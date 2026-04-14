@@ -160,6 +160,10 @@ export async function proxyRequest(
         responseHeaders.delete('transfer-encoding');
         responseHeaders.delete('connection');
         responseHeaders.delete('keep-alive');
+        responseHeaders.delete('upgrade');
+        responseHeaders.delete('te');
+        responseHeaders.delete('proxy-authenticate');
+        responseHeaders.delete('proxy-authorization');
 
         return new NextResponse(response.body, {
             status: response.status,

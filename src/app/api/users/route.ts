@@ -76,10 +76,6 @@ export async function DELETE(req: NextRequest) {
     try {
         const { id } = await req.json();
 
-        // Prevent deleting the last user or self? 
-        // For self-delete protection, we need to know current user ID from session.
-        // Assuming middleware handles session, but here we can just do basic checks.
-
         // Validate id is a number
         if (typeof id !== 'number' || !Number.isInteger(id) || id <= 0) {
             return NextResponse.json({ error: 'Invalid user ID' }, { status: 400 });
@@ -90,13 +86,12 @@ export async function DELETE(req: NextRequest) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 });
         }
 
-        // Check user count before deletion (atomic check)
-        const userCount = getUserCount();
-        if (userCount <= 1) {
+        // Atomic deletion with last-user protection (race-condition safe)
+        const deleted = deleteUser(id);
+        if (!deleted) {
             return NextResponse.json({ error: 'Cannot delete the last user' }, { status: 400 });
         }
 
-        deleteUser(id);
         return NextResponse.json({ success: true });
     } catch (e: unknown) {
         console.error('User operation error:', e);

@@ -30,35 +30,55 @@ export default function CustomWidget({
     const IconComponent = icon ? (LucideIcons as unknown as Record<string, React.ElementType>)[icon] : null;
 
     useEffect(() => {
+        let mounted = true;
+        const controller = new AbortController();
+
         const fetchData = async () => {
             if (!endpoint) return;
             try {
                 const proxyUrl = `/api/proxy?url=${encodeURIComponent(endpoint)}`;
-                const res = await fetch(proxyUrl);
+                const res = await fetch(proxyUrl, { signal: controller.signal });
 
+                if (!mounted) return;
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
                 const json = await res.json();
                 setData(json);
                 setError(null);
             } catch (err) {
+                if (!mounted) return;
+                if (err instanceof DOMException && err.name === 'AbortError') return;
                 console.error(`Fetch error for ${title}:`, err);
                 setError('Failed to fetch data');
             } finally {
-                setLoading(false);
+                if (mounted) setLoading(false);
             }
         };
 
         fetchData();
         const interval = setInterval(fetchData, refreshInterval);
-        return () => clearInterval(interval);
+        return () => {
+            mounted = false;
+            controller.abort();
+            clearInterval(interval);
+        };
     }, [endpoint, refreshInterval, title]);
 
-    // Simple template engine
+    // Simple template engine with HTML entity encoding for safety
     const renderTemplate = () => {
         if (!data) return '';
 
         let html = '';
+
+        // HTML entity encode to prevent XSS from data values
+        const escapeHtml = (str: string): string => {
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        };
 
         // Helper to replace variables in a string
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -69,7 +89,7 @@ export default function CustomWidget({
                 for (const key of keys) {
                     value = value?.[key];
                 }
-                return value !== undefined && value !== null ? String(value) : '';
+                return value !== undefined && value !== null ? escapeHtml(String(value)) : '';
             });
         };
 

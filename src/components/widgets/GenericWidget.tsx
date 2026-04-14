@@ -83,12 +83,16 @@ export default function GenericWidget({
     const IconComponent = icon ? (LucideIcons as unknown as Record<string, React.ElementType>)[icon] : null;
 
     useEffect(() => {
+        let mounted = true;
+        const controller = new AbortController();
+
         const fetchData = async () => {
             try {
                 // Use internal proxy to avoid CORS issues
                 const proxyUrl = `/api/proxy?url=${encodeURIComponent(endpoint)}`;
-                const res = await fetch(proxyUrl, { credentials: 'include' });
+                const res = await fetch(proxyUrl, { credentials: 'include', signal: controller.signal });
 
+                if (!mounted) return;
                 if (!res.ok) {
                     throw new Error(`HTTP ${res.status}`);
                 }
@@ -96,17 +100,23 @@ export default function GenericWidget({
                 setData(json);
                 setError(null);
             } catch (err: unknown) {
+                if (!mounted) return;
+                if (err instanceof DOMException && err.name === 'AbortError') return;
                 const errorMessage = err instanceof Error ? err.message : String(err);
                 console.error(`Failed to fetch widget data for ${title}:`, err);
                 setError(errorMessage || 'Fetch failed');
             } finally {
-                setLoading(false);
+                if (mounted) setLoading(false);
             }
         };
 
         fetchData();
         const interval = setInterval(fetchData, refreshInterval);
-        return () => clearInterval(interval);
+        return () => {
+            mounted = false;
+            controller.abort();
+            clearInterval(interval);
+        };
     }, [endpoint, refreshInterval, title]);
 
     if (loading && !data && !error) {

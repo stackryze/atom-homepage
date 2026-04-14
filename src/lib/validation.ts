@@ -15,7 +15,12 @@ export const passwordSchema = z.string()
 export const serviceSchema = z.object({
     id: z.string(),
     name: z.string().min(1, 'Service name is required'),
-    url: z.string().url('Invalid URL'),
+    url: z.string().url('Invalid URL').refine((url) => {
+        try {
+            const parsed = new URL(url);
+            return ['http:', 'https:'].includes(parsed.protocol);
+        } catch { return false; }
+    }, 'URL must use http or https protocol'),
     icon: z.string().optional(),
     category: z.string().optional(),
     description: z.string().optional(),
@@ -30,7 +35,12 @@ export const serviceSchema = z.object({
 export const linkSchema = z.object({
     id: z.string(),
     title: z.string().min(1, 'Link title is required'),
-    url: z.string().url('Invalid URL'),
+    url: z.string().url('Invalid URL').refine((url) => {
+        try {
+            const parsed = new URL(url);
+            return ['http:', 'https:'].includes(parsed.protocol);
+        } catch { return false; }
+    }, 'URL must use http or https protocol'),
     icon: z.string().optional(),
 });
 

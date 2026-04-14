@@ -35,8 +35,10 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/src/lib/schema.sql ./src/lib/schema.sql
+COPY --from=builder /app/src/lib/schema_oauth.sql ./src/lib/schema_oauth.sql
+COPY --from=builder /app/src/lib/schema_federated.sql ./src/lib/schema_federated.sql
 
-RUN mkdir -p /app/data && chmod 755 /app/data
+RUN mkdir -p /app/data && chmod 700 /app/data
 
 ENV DATA_DIR="/app/data"
 VOLUME ["/app/data"]

@@ -16,9 +16,13 @@ export default function DockerWidget() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
+        let mounted = true;
+        const controller = new AbortController();
+
         const fetchStats = async () => {
             try {
-                const res = await fetch('/api/docker/containers');
+                const res = await fetch('/api/docker/containers', { signal: controller.signal });
+                if (!mounted) return;
                 if (res.ok) {
                     const data = await res.json();
                     const containers: SimpleContainer[] = data.containers;
@@ -34,14 +38,20 @@ export default function DockerWidget() {
                     setError(data.error || 'Failed to fetch');
                 }
             } catch (e) {
-                console.error(e);
-                setError('Network Error');
+                if (mounted && !(e instanceof DOMException && e.name === 'AbortError')) {
+                    console.error(e);
+                    setError('Network Error');
+                }
             }
         };
 
         fetchStats();
         const interval = setInterval(fetchStats, 5000);
-        return () => clearInterval(interval);
+        return () => {
+            mounted = false;
+            controller.abort();
+            clearInterval(interval);
+        };
     }, []);
 
     if (error) {

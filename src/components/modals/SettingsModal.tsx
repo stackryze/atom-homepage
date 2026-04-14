@@ -91,6 +91,9 @@ export default function SettingsModal({ isOpen, onClose, config, onUpdate }: Set
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
+                role="dialog"
+                aria-modal="true"
+                aria-label="Settings"
             >
                 <motion.div
                     className={styles.modal}

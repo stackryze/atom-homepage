@@ -197,7 +197,7 @@ export default function ContainerExecModal({ containerId, containerName, onClose
     if (!mounted) return null;
 
     return createPortal(
-        <div className={styles.overlay} onClick={onClose}>
+        <div className={styles.overlay} onClick={onClose} role="dialog" aria-modal="true" aria-label="Container Terminal">
             <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
                 <div className={styles.header}>
                     <div className={styles.headerInfo}>

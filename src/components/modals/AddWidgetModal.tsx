@@ -218,7 +218,7 @@ export default function AddWidgetModal({ onClose, onSave, initialData }: AddWidg
     };
 
     return (
-        <div className={styles.overlay}>
+        <div className={styles.overlay} role="dialog" aria-modal="true" aria-label="Add Widget">
             <div className={styles.modal}>
                 {/* ... Header ... */}
                 <div className={styles.header}>

@@ -86,8 +86,8 @@ try {
             console.log('Migrating database: Adding role column to users table...');
             db.prepare("ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'member'").run();
 
-            // Set ID 1 and special users to admin
-            db.prepare("UPDATE users SET role = 'admin' WHERE id = 1 OR username = 'admin' OR username = 'VishnuByrraju'").run();
+            // Set ID 1 to admin
+            db.prepare("UPDATE users SET role = 'admin' WHERE id = 1 OR username = 'admin'").run();
         }
 
     } catch (migErr) {
@@ -283,16 +283,20 @@ export function getAllUsersSafe(): Omit<User, 'password_hash'>[] {
     });
 }
 
-export function deleteUser(id: number): void {
-    const deleteSessionsStmt = getStmt('DELETE FROM sessions WHERE user_id = ?');
-    const deleteUserStmt = getStmt('DELETE FROM users WHERE id = ?');
-
+export function deleteUser(id: number): boolean {
+    // Atomic transaction: check user count and delete in one transaction
+    // Prevents race condition where two simultaneous deletes could remove last user
     const transaction = db.transaction(() => {
-        deleteSessionsStmt.run(id);
-        deleteUserStmt.run(id);
+        const count = getStmt('SELECT COUNT(*) as count FROM users').get() as { count: number };
+        if (count.count <= 1) {
+            return false;
+        }
+        getStmt('DELETE FROM sessions WHERE user_id = ?').run(id);
+        const result = getStmt('DELETE FROM users WHERE id = ?').run(id);
+        return result.changes > 0;
     });
 
-    transaction();
+    return transaction();
 }
 
 // Session operations
@@ -334,6 +338,9 @@ export function getSessionWithUser(id: string): (Session & { user: User }) | und
         cleanupExpiredSessions();
     }
 
+    // Also trigger OAuth cleanup periodically
+    triggerOAuthCleanupIfNeeded();
+
     return { ...session, user };
 }
 
@@ -348,6 +355,25 @@ export function deleteAllUserSessions(userId: number): void {
 // Cleanup expired sessions
 export function cleanupExpiredSessions(): void {
     getStmt("DELETE FROM sessions WHERE expires_at < datetime('now')").run();
+}
+
+// Periodic OAuth token cleanup (runs alongside session cleanup)
+let oauthCleanupCount = 0;
+const OAUTH_CLEANUP_INTERVAL = 50; // Cleanup every 50 session checks
+
+export function triggerOAuthCleanupIfNeeded(): void {
+    oauthCleanupCount++;
+    if (oauthCleanupCount >= OAUTH_CLEANUP_INTERVAL) {
+        oauthCleanupCount = 0;
+        try {
+            // Clean up expired OAuth data directly with SQL
+            db.exec("DELETE FROM oauth_authorization_codes WHERE expires_at < datetime('now')");
+            db.exec("DELETE FROM oauth_access_tokens WHERE expires_at < datetime('now')");
+            db.exec("DELETE FROM oauth_refresh_tokens WHERE expires_at < datetime('now')");
+        } catch {
+            // Tables may not exist if OAuth is not configured
+        }
+    }
 }
 
 // Config operations

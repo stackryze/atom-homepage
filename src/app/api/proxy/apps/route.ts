@@ -53,6 +53,22 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        // Validate backend URL scheme
+        try {
+            const backendParsed = new URL(backend_url);
+            if (!['http:', 'https:'].includes(backendParsed.protocol)) {
+                return NextResponse.json(
+                    { error: 'Backend URL must use http or https protocol' },
+                    { status: 400 }
+                );
+            }
+        } catch {
+            return NextResponse.json(
+                { error: 'Invalid backend URL format' },
+                { status: 400 }
+            );
+        }
+
         // Check if slug already exists
         const existing = getProtectedApplicationBySlug(slug);
         if (existing) {

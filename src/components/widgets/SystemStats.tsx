@@ -18,10 +18,13 @@ export default function SystemStatsWidget() {
     const [cpuHistory, setCpuHistory] = useState<number[]>(new Array(20).fill(0));
 
     useEffect(() => {
+        let mounted = true;
+        const controller = new AbortController();
+
         const fetchStats = async () => {
             try {
-                const res = await fetch('/api/stats');
-                if (res.ok) {
+                const res = await fetch('/api/stats', { signal: controller.signal });
+                if (res.ok && mounted) {
                     const data = await res.json();
                     setStats(data);
                     setCpuHistory(prev => {
@@ -30,13 +33,19 @@ export default function SystemStatsWidget() {
                     });
                 }
             } catch (e) {
-                console.error(e);
+                if (mounted && !(e instanceof DOMException && e.name === 'AbortError')) {
+                    console.error(e);
+                }
             }
         };
         fetchStats();
         // Update every 5 seconds as requested
         const interval = setInterval(fetchStats, 5000);
-        return () => clearInterval(interval);
+        return () => {
+            mounted = false;
+            controller.abort();
+            clearInterval(interval);
+        };
     }, []);
 
     // Generate SVG path for the graph

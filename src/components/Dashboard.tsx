@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search, Grid3X3, Grid2X2, List as ListIcon, ChevronRight, Edit2, Check } from 'lucide-react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent, DragOverlay, useDroppable } from '@dnd-kit/core';
@@ -239,7 +239,7 @@ export default function Dashboard({ user }: { user?: { username: string; tags?: 
     const userTags = user?.tags || [];
     const hasAllAccess = userTags.includes('all') || user?.role === 'admin';
 
-    const filteredServices = config.services.filter(s => {
+    const filteredServices = useMemo(() => config.services.filter(s => {
         // Tag Access Control
         if (!hasAllAccess) {
             const serviceTags = s.tags || [];
@@ -252,7 +252,7 @@ export default function Dashboard({ user }: { user?: { username: string; tags?: 
         // Search Filter
         return s.name.toLowerCase().includes(search.toLowerCase()) ||
             s.url.toLowerCase().includes(search.toLowerCase());
-    });
+    }), [config.services, hasAllAccess, userTags, search]);
 
     const getSearchUrl = (query: string) => {
         const searchEngines: { [key: string]: string } = {
@@ -263,10 +263,10 @@ export default function Dashboard({ user }: { user?: { username: string; tags?: 
         return searchEngines[config.searchEngine || 'Google'] || searchEngines['Google'];
     };
 
-    const filteredLinks = config.links.filter(l =>
+    const filteredLinks = useMemo(() => config.links.filter(l =>
         l.title.toLowerCase().includes(search.toLowerCase()) ||
         l.url.toLowerCase().includes(search.toLowerCase())
-    );
+    ), [config.links, search]);
 
     const hasResults = filteredServices.length > 0 || filteredLinks.length > 0;
 
@@ -356,6 +356,7 @@ export default function Dashboard({ user }: { user?: { username: string; tags?: 
                 <input
                     ref={searchRef}
                     placeholder={`Search ${config.searchEngine || 'Google'}...`}
+                    aria-label={`Search services or ${config.searchEngine || 'Google'}`}
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                 />

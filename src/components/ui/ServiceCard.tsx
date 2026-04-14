@@ -66,7 +66,7 @@ export default function ServiceCard({ service, compact = false }: ServiceCardPro
                         {isActuallyLoading ? (
                             <PingLoader className={styles.statusLoader} />
                         ) : (
-                            <div className={`${styles.statusDot} ${styles[status.state]}`} title={`Status: ${status.state.toUpperCase()} ${status.code ? `(${status.code})` : ''} - ${status.latency}ms`} />
+                            <div className={`${styles.statusDot} ${styles[status.state]}`} title={`Status: ${status.state.toUpperCase()} ${status.code ? `(${status.code})` : ''} - ${status.latency}ms`} role="status" aria-label={`Service status: ${status.state}`} />
                         )}
                     </>
                 )}

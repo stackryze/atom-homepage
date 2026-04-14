@@ -145,7 +145,13 @@ export async function POST(request: NextRequest) {
         // Validate redirect URIs
         for (const uri of redirect_uris) {
             try {
-                new URL(uri);
+                const parsed = new URL(uri);
+                if (!['http:', 'https:'].includes(parsed.protocol)) {
+                    return NextResponse.json(
+                        { error: 'invalid_request', message: `Redirect URI must use http or https: ${uri}` },
+                        { status: 400 }
+                    );
+                }
             } catch {
                 return NextResponse.json(
                     { error: 'invalid_request', message: `Invalid redirect URI: ${uri}` },

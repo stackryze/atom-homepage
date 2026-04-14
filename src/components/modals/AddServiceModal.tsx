@@ -79,7 +79,7 @@ export default function AddServiceModal({ onClose, onSave, category = 'General',
     };
 
     return (
-        <div className={styles.overlay}>
+        <div className={styles.overlay} role="dialog" aria-modal="true" aria-label="Add Service">
             <div className={styles.modal}>
                 <div className={styles.header}>
                     <h2>{initialData ? 'Edit' : 'Add'} {category === 'Bookmarks' ? 'Bookmark' : 'Application'}</h2>
