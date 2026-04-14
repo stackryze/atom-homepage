@@ -1,9 +1,41 @@
+# Dependencies
+node_modules
+npm-debug.log*
+
+# Build output
+.next
+out
+build
+
+# Version control
+.git
+.gitignore
+
+# Docker
 Dockerfile
 .dockerignore
-node_modules
-npm-debug.log
-README.md
-.next
-.git
+docker-compose*.yml
+
+# Data & config
 data
+
+# Docs & meta
+README.md
+CONTRIBUTING.md
+CODE_OF_CONDUCT.md
+LICENSE.md
+docs
+
+# Dev tools
 scripts
+.vscode
+.idea
+*.md
+jest.config.js
+jest.setup.js
+eslint.config.mjs
+.prettierrc
+**/__tests__
+**/*.test.*
+**/*.spec.*
+coverage

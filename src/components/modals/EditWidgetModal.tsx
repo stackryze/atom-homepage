@@ -42,7 +42,7 @@ export default function EditWidgetModal({ widgets, onClose, onDelete, onEdit }: 
     };
 
     return (
-        <div className={styles.overlay}>
+        <div className={styles.overlay} role="dialog" aria-modal="true" aria-label="Edit Widget">
             <div className={styles.modal}>
                 <div className={styles.header}>
                     <div className={styles.headerContent}>

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import styles from './page.module.css';
 
 export default function OnboardPage() {
@@ -54,6 +55,13 @@ export default function OnboardPage() {
     return (
         <div className={styles.container}>
             <div className={styles.card}>
+                <Image src="/atom-logo.png" alt="Atom" width={48} height={48} className={styles.logo} />
+
+                <div className={styles.stepIndicator}>
+                    <div className={`${styles.stepDot} ${styles.stepDotActive}`} />
+                    <div className={styles.stepDot} />
+                    <div className={styles.stepDot} />
+                </div>
 
                 <h1 className={styles.title}>Welcome to Atom</h1>
                 <p className={styles.subtitle}>Create your admin account to get started</p>
@@ -110,6 +118,8 @@ export default function OnboardPage() {
                         {loading ? 'Creating...' : 'Create Account'}
                     </button>
                 </form>
+
+                <div className={styles.footer}>Powered by Atom</div>
             </div>
         </div>
     );

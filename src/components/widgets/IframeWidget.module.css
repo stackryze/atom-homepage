@@ -1,0 +1,81 @@
+.widget {
+    background: var(--bg-card, rgba(255, 255, 255, 0.03));
+    border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.06));
+    border-radius: var(--radius-lg, 16px);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.widget.expanded {
+    position: fixed;
+    top: 2rem;
+    left: 2rem;
+    right: 2rem;
+    bottom: 2rem;
+    z-index: 100;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.06));
+}
+
+.title {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-secondary, #888);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.actions {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.actionBtn {
+    background: none;
+    border: none;
+    color: var(--text-secondary, #888);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.actionBtn:hover {
+    color: var(--text-primary, #fff);
+    background: var(--bg-secondary, rgba(255, 255, 255, 0.05));
+}
+
+.iframeContainer {
+    flex: 1;
+    min-height: 200px;
+    transition: height 0.3s ease;
+}
+
+.iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: var(--bg-primary, #000);
+}
+
+.empty, .error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 2rem 1rem;
+    color: var(--text-secondary, #888);
+    font-size: 0.8rem;
+}

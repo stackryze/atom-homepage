@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { X, ArrowUpDown, Edit3 } from 'lucide-react';
 import { Service } from '@/types';
-import * as simpleIcons from 'simple-icons';
+import { getSimpleIcon } from '@/lib/icons';
 import styles from './EditServiceModal.module.css';
 
 interface EditServiceModalProps {
@@ -49,7 +49,7 @@ export default function EditServiceModal({ services, onClose, onDelete, onEdit, 
     };
 
     return (
-        <div className={styles.overlay}>
+        <div className={styles.overlay} role="dialog" aria-modal="true" aria-label="Edit Service">
             <div className={styles.modal}>
                 <div className={styles.header}>
                     <div className={styles.headerContent}>
@@ -94,9 +94,7 @@ export default function EditServiceModal({ services, onClose, onDelete, onEdit, 
                                 // Render Icon
                                 let IconPath = null;
                                 if (s.icon) {
-                                    const slug = 'si' + s.icon.charAt(0).toUpperCase() + s.icon.slice(1);
-                                    // @ts-expect-error SimpleIcons indexing by string key
-                                    const iconData = simpleIcons[slug];
+                                    const iconData = getSimpleIcon(s.icon);
                                     if (iconData) IconPath = iconData.path;
                                 }
 

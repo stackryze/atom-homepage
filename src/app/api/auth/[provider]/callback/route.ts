@@ -210,7 +210,8 @@ export async function GET(
             } else if (autoRegister) {
                 // Auto-register new user
                 const finalUsername = username || email?.split('@')[0] || `user_${subject.substring(0, 8)}`;
-                const dummyHash = '$2a$10$federated_dummy_hash_auth_' + crypto.randomUUID();
+                // Use a random non-loginable password hash for federated-only users
+                const dummyHash = `$2a$10$${crypto.randomUUID().replace(/-/g, '')}$federated_nopassword`;
 
                 try {
                     const newUser = createUser(finalUsername, dummyHash, email || undefined);

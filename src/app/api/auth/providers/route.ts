@@ -35,7 +35,8 @@ export async function GET(request: NextRequest) {
             // We need slug to construct /api/auth/[slug]/login
             const publicProviders = providers.map(p => ({
                 name: p.name,
-                slug: p.slug
+                slug: p.slug,
+                auto_launch: p.auto_launch || false
             }));
             return NextResponse.json(publicProviders);
         }
@@ -75,7 +76,10 @@ export async function POST(request: NextRequest) {
             userinfo_endpoint: body.userinfo_endpoint,
             jwks_uri: body.jwks_uri,
             scopes: body.scopes,
-            enabled: body.enabled !== false // Default to true
+            enabled: body.enabled !== false,
+            user_match_field: body.user_match_field || 'email',
+            auto_register: body.auto_register !== false,
+            auto_launch: body.auto_launch || false
         });
 
         return NextResponse.json({
@@ -144,7 +148,10 @@ export async function PUT(request: NextRequest) {
             userinfo_endpoint: body.userinfo_endpoint,
             jwks_uri: body.jwks_uri,
             scopes: body.scopes,
-            enabled: body.enabled
+            enabled: body.enabled,
+            user_match_field: body.user_match_field,
+            auto_register: body.auto_register,
+            auto_launch: body.auto_launch
         });
 
         if (success) {

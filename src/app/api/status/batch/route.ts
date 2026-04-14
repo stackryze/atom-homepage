@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkServiceStatus, StatusResult } from '@/lib/status-checker';
 import { getCurrentUser } from '@/lib/auth';
+import { recordUptime } from '@/lib/db';
 import { z } from 'zod';
 
 const batchRequestSchema = z.object({
@@ -30,32 +31,37 @@ export async function POST(request: NextRequest) {
         // Limit batch size to prevent abuse/timeout
         const safeUrls = urls.slice(0, 50);
 
-        // Execute all checks in parallel
-        const promises = safeUrls.map(async (url) => {
-            try {
-                const result = await checkServiceStatus(url);
-                return { url, result };
-            } catch {
-                return {
-                    url,
-                    result: {
-                        up: false,
-                        status: 0,
-                        latency: 0,
-                        method: 'fetch',
-                        error: 'Check failed'
-                    } as StatusResult
-                };
-            }
-        });
-
-        const results = await Promise.all(promises);
-
-        // Transform to map { url: result }
+        // Execute checks with concurrency control (10 at a time)
+        const CONCURRENCY = 10;
         const resultMap: Record<string, StatusResult> = {};
-        results.forEach(({ url, result }) => {
-            resultMap[url] = result;
-        });
+
+        for (let i = 0; i < safeUrls.length; i += CONCURRENCY) {
+            const batch = safeUrls.slice(i, i + CONCURRENCY);
+            const batchResults = await Promise.all(
+                batch.map(async (url) => {
+                    try {
+                        const result = await checkServiceStatus(url);
+                        return { url, result };
+                    } catch {
+                        return {
+                            url,
+                            result: {
+                                up: false,
+                                status: 0,
+                                latency: 0,
+                                method: 'fetch',
+                                error: 'Check failed'
+                            } as StatusResult
+                        };
+                    }
+                })
+            );
+            batchResults.forEach(({ url, result }) => {
+                resultMap[url] = result;
+                const status = result.up ? (result.latency > 500 ? 'slow' : 'up') : 'down';
+                recordUptime(url, status as 'up' | 'down' | 'slow', result.status, result.latency);
+            });
+        }
 
         return NextResponse.json({ results: resultMap });
 

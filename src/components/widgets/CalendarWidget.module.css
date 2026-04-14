@@ -1,0 +1,99 @@
+.widget {
+    background: var(--bg-card, rgba(255, 255, 255, 0.03));
+    border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.06));
+    border-radius: var(--radius-lg, 16px);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.navBtn {
+    background: none;
+    border: none;
+    color: var(--text-secondary, #888);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    transition: all 0.15s ease;
+}
+
+.navBtn:hover {
+    color: var(--text-primary, #fff);
+    background: var(--bg-secondary, rgba(255, 255, 255, 0.05));
+}
+
+.monthLabel {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-primary, #fff);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 12px;
+    border-radius: 6px;
+    transition: background 0.15s ease;
+}
+
+.monthLabel:hover {
+    background: var(--bg-secondary, rgba(255, 255, 255, 0.05));
+}
+
+.weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+}
+
+.weekday {
+    font-size: 0.55rem;
+    font-weight: 600;
+    color: var(--text-secondary, #888);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 4px 0;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    gap: 2px;
+}
+
+.day {
+    font-size: 0.7rem;
+    color: var(--text-primary, #fff);
+    padding: 4px;
+    border-radius: 6px;
+    cursor: default;
+    line-height: 1.6;
+    transition: background 0.1s ease;
+}
+
+.day:hover:not(.empty) {
+    background: var(--bg-secondary, rgba(255, 255, 255, 0.05));
+}
+
+.day.empty {
+    cursor: default;
+}
+
+.day.today {
+    background: var(--accent-color, #d4a574);
+    color: #000;
+    font-weight: 700;
+    border-radius: 50%;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

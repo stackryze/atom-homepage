@@ -1,17 +1,43 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Docker from 'dockerode';
 import { Duplex } from 'stream';
+import { getCurrentUser } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
+// Max concurrent sessions to prevent memory exhaustion
+const MAX_SESSIONS = 20;
+const SESSION_TIMEOUT = 15 * 60 * 1000; // 15 minutes
+
 // Store active exec sessions in memory (consider Redis for production)
 const activeSessions = new Map<string, { stream: Duplex; exec: Docker.Exec }>();
+
+// Validate container ID format (hex string, 12-64 chars)
+function isValidContainerId(id: string): boolean {
+    return /^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,63}$/.test(id);
+}
 
 export async function GET(
     request: NextRequest,
     { params }: { params: Promise<{ id: string }> }
 ) {
+    // Authentication check
+    const user = await getCurrentUser();
+    if (!user) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { id } = await params;
+
+    // Validate container ID
+    if (!isValidContainerId(id)) {
+        return NextResponse.json({ error: 'Invalid container ID' }, { status: 400 });
+    }
+
+    // Enforce max sessions
+    if (activeSessions.size >= MAX_SESSIONS) {
+        return NextResponse.json({ error: 'Too many active sessions' }, { status: 429 });
+    }
 
     try {
         const docker = new Docker();
@@ -37,11 +63,11 @@ export async function GET(
         const sessionId = `${id}-${Date.now()}`;
         activeSessions.set(sessionId, { stream, exec });
 
-        // Clean up after 30 minutes
+        // Clean up after timeout
         setTimeout(() => {
             activeSessions.delete(sessionId);
             stream.destroy();
-        }, 30 * 60 * 1000);
+        }, SESSION_TIMEOUT);
 
         // Create readable stream for response
         const readableStream = new ReadableStream({
@@ -93,10 +119,21 @@ export async function POST(
     request: NextRequest,
     { params }: { params: Promise<{ id: string }> }
 ) {
+    // Authentication check
+    const user = await getCurrentUser();
+    if (!user) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     await params; // consume params
 
     try {
-        const body = await request.json();
+        let body;
+        try {
+            body = await request.json();
+        } catch {
+            return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+        }
         const { sessionId, data } = body;
 
         if (!sessionId || data === undefined) {

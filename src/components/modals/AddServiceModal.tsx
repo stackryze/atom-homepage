@@ -2,18 +2,12 @@
 
 import { useState } from 'react';
 import { X, Search } from 'lucide-react';
-import * as simpleIcons from 'simple-icons';
+import { getAllIcons } from '@/lib/icons';
 import { toast } from 'sonner';
 import { Service } from '@/types';
 import styles from './AddServiceModal.module.css';
 
-// Pre-compute minimal icon list for performance
-const ALL_ICONS = Object.values(simpleIcons).map(icon => ({
-    title: icon.title,
-    slug: icon.slug,
-    path: icon.path,
-    hex: icon.hex
-}));
+const ALL_ICONS = getAllIcons();
 
 interface AddServiceModalProps {
     onClose: () => void;
@@ -79,7 +73,7 @@ export default function AddServiceModal({ onClose, onSave, category = 'General',
     };
 
     return (
-        <div className={styles.overlay}>
+        <div className={styles.overlay} role="dialog" aria-modal="true" aria-label="Add Service">
             <div className={styles.modal}>
                 <div className={styles.header}>
                     <h2>{initialData ? 'Edit' : 'Add'} {category === 'Bookmarks' ? 'Bookmark' : 'Application'}</h2>

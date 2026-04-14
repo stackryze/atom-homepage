@@ -19,11 +19,11 @@ export default function ShortcutsModal({ onClose }: ShortcutsModalProps) {
     ];
 
     return (
-        <div className={styles.overlay} onClick={onClose}>
+        <div className={styles.overlay} onClick={onClose} role="dialog" aria-modal="true" aria-label="Keyboard Shortcuts">
             <div className={styles.modal} onClick={e => e.stopPropagation()}>
                 <div className={styles.header}>
                     <h2>Keyboard Shortcuts</h2>
-                    <button onClick={onClose} className={styles.closeBtn}>
+                    <button onClick={onClose} className={styles.closeBtn} aria-label="Close">
                         <X size={20} />
                     </button>
                 </div>

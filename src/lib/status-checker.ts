@@ -51,27 +51,57 @@ export async function checkServiceStatus(urlString: string): Promise<StatusResul
             const timeoutId = setTimeout(() => controller.abort(), 5000);
 
             try {
-                const response = await fetch(urlString, {
-                    method: 'GET',
+                // Use HEAD to measure latency without downloading the full response body.
+                // Don't follow redirects — a 3xx still means the server is alive,
+                // and following adds extra DNS+TLS round trips (e.g. google.com → www.google.com).
+                let response = await fetch(urlString, {
+                    method: 'HEAD',
                     headers: {
                         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
+                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
                     },
                     signal: controller.signal,
                     cache: 'no-store',
-                    redirect: 'follow'
+                    redirect: 'manual'
                 });
 
-                // Always clear timeout to prevent memory leaks
-                clearTimeout(timeoutId);
                 const latency = Date.now() - start;
 
-                // Interpret response
-                // Any 2xx-5xx response means the server is UP and reachable.
-                // But typically for dashboards, 200-299 is "UP".
-                // Let's stick to ok (200-299) for UP status per previous feedback.
+                // Some servers reject HEAD — retry with GET but abort the body immediately
+                if (response.status === 405) {
+                    const retryStart = Date.now();
+                    response = await fetch(urlString, {
+                        method: 'GET',
+                        headers: {
+                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+                        },
+                        signal: controller.signal,
+                        cache: 'no-store',
+                        redirect: 'manual'
+                    });
+                    clearTimeout(timeoutId);
+                    try { response.body?.cancel(); } catch { /* ignore */ }
+
+                    const retryLatency = Date.now() - retryStart;
+                    return {
+                        up: response.status > 0 && response.status < 500,
+                        status: response.status,
+                        latency: retryLatency,
+                        method: 'fetch' as const
+                    };
+                }
+
+                clearTimeout(timeoutId);
+
+                // Discard the body to free resources
+                try { response.body?.cancel(); } catch { /* ignore */ }
+
+                // Treat 2xx and 3xx (redirects) as UP — the server responded
+                const isUp = response.status > 0 && response.status < 500;
+
                 return {
-                    up: response.ok,
+                    up: isUp,
                     status: response.status,
                     latency: latency,
                     method: 'fetch'

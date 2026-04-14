@@ -45,7 +45,7 @@ export function StatusProvider({ children }: { children: ReactNode }) {
             if (service.ping) {
                 // Ping response: { alive, time }
                 return {
-                    state: data.alive ? (data.time > 200 ? 'slow' : 'up') : 'down',
+                    state: data.up ? (data.latency > 500 ? 'slow' : 'up') : 'down',
                     code: data.alive ? 200 : 0,
                     latency: data.time || 0,
                     lastUpdated: Date.now()
@@ -53,7 +53,7 @@ export function StatusProvider({ children }: { children: ReactNode }) {
             } else {
                 // HTTP response: { up, status, latency }
                 return {
-                    state: data.up ? (data.latency > 200 ? 'slow' : 'up') : 'down',
+                    state: data.up ? (data.latency > 500 ? 'slow' : 'up') : 'down',
                     code: data.status,
                     latency: data.latency,
                     lastUpdated: Date.now()
@@ -144,7 +144,7 @@ export function StatusProvider({ children }: { children: ReactNode }) {
                             httpServices.filter(s => s.url === url).forEach(s => {
                                 const key = s.id || s.url;
                                 next[key] = {
-                                    state: res.up ? (res.latency > 200 ? 'slow' : 'up') : 'down',
+                                    state: res.up ? (res.latency > 500 ? 'slow' : 'up') : 'down',
                                     code: res.status,
                                     latency: res.latency,
                                     lastUpdated: Date.now()

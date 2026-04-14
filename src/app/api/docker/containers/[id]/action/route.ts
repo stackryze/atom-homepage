@@ -1,12 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Docker from 'dockerode';
+import { getCurrentUser } from '@/lib/auth';
 
 export async function POST(
     request: NextRequest,
     { params }: { params: Promise<{ id: string }> }
 ) {
+    // Authentication check
+    const user = await getCurrentUser();
+    if (!user) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { id } = await params;
-    const { action } = await request.json();
+
+    // Validate container ID format
+    if (!/^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,63}$/.test(id)) {
+        return NextResponse.json({ error: 'Invalid container ID' }, { status: 400 });
+    }
+
+    let body;
+    try {
+        body = await request.json();
+    } catch {
+        return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
+    const { action } = body;
 
     try {
         const docker = new Docker();

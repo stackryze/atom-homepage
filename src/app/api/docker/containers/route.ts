@@ -117,14 +117,15 @@ export async function GET() {
         return NextResponse.json({ containers: containersWithStats });
     } catch (error: unknown) {
         const errorMsg = error instanceof Error ? error.message : String(error);
+        // Only log at debug level - Docker being unavailable is normal on dev machines
+        if (errorMsg.includes('ENOENT') || errorMsg.includes('ECONNREFUSED')) {
+            // Docker not running - return empty container list gracefully
+            return NextResponse.json({ containers: [], dockerAvailable: false });
+        }
         console.error('Docker API Error:', error);
-        const isWindows = process.platform === 'win32';
-        const socketPath = isWindows ? '//./pipe/docker_engine' : '/var/run/docker.sock';
-
         return NextResponse.json({
             error: 'Failed to connect to Docker',
             details: errorMsg,
-            hint: `Tried default socket: ${socketPath}. Ensure Docker is running.`
         }, { status: 500 });
     }
 }

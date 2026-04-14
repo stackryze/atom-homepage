@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { ArrowUpDown, Edit3, Trash2 } from 'lucide-react';
 import { Service } from '@/types';
-import * as simpleIcons from 'simple-icons';
+import { getSimpleIcon } from '@/lib/icons';
 import styles from './EditableTable.module.css';
 
 interface EditableTableProps {
@@ -88,9 +88,7 @@ export default function EditableTable({ items, onDelete, onEdit, title = "Items"
                             // Render Icon
                             let IconPath = null;
                             if (s.icon) {
-                                const slug = 'si' + s.icon.charAt(0).toUpperCase() + s.icon.slice(1);
-                                // @ts-expect-error SimpleIcons indexing by string key
-                                const iconData = simpleIcons[slug];
+                                const iconData = getSimpleIcon(s.icon);
                                 if (iconData) IconPath = iconData.path;
                             }
 

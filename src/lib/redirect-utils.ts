@@ -5,6 +5,11 @@ export function isValidRedirectUrl(url: string, baseUrl: string): boolean {
 
     try {
         if (url.startsWith('/')) {
+            // Block protocol-relative URLs and path traversal
+            if (url.startsWith('//')) return false;
+            // Normalize and check for path traversal
+            const normalized = new URL(url, baseUrl).pathname;
+            if (normalized.includes('..')) return false;
             return true;
         }
 

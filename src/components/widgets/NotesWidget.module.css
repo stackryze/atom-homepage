@@ -1,0 +1,143 @@
+.card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.notesList {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 280px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+.noteItem {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: var(--bg-secondary, rgba(255,255,255,0.03));
+    border: 1px solid var(--border-subtle, rgba(255,255,255,0.06));
+    transition: all 0.15s ease;
+    position: relative;
+}
+
+.noteItem:hover {
+    border-color: var(--border-subtle, rgba(255,255,255,0.12));
+}
+
+.noteItem.pinned {
+    border-left: 2px solid var(--accent-color, #d4a574);
+}
+
+.noteColorDot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 6px;
+}
+
+.noteContent {
+    flex: 1;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    color: var(--text-primary, #fff);
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.noteTime {
+    font-size: 0.65rem;
+    color: var(--text-secondary, #666);
+    margin-top: 4px;
+}
+
+.noteActions {
+    display: flex;
+    gap: 2px;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+.noteItem:hover .noteActions {
+    opacity: 1;
+}
+
+.noteActionBtn {
+    background: none;
+    border: none;
+    padding: 2px;
+    color: var(--text-secondary, #666);
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+}
+
+.noteActionBtn:hover {
+    color: var(--text-primary, #fff);
+    background: rgba(255,255,255,0.06);
+}
+
+.noteActionBtn.danger:hover {
+    color: #ef4444;
+}
+
+.addForm {
+    display: flex;
+    gap: 6px;
+}
+
+.addInput {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-subtle, rgba(255,255,255,0.08));
+    background: var(--bg-secondary, rgba(255,255,255,0.03));
+    color: var(--text-primary, #fff);
+    font-size: 0.8rem;
+    font-family: var(--font-sans);
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.addInput:focus {
+    border-color: var(--accent-color, #d4a574);
+}
+
+.addInput::placeholder {
+    color: var(--text-secondary, #666);
+}
+
+.addBtn {
+    padding: 8px;
+    border-radius: 8px;
+    border: none;
+    background: var(--accent-color, #d4a574);
+    color: #000;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.15s;
+}
+
+.addBtn:hover {
+    opacity: 0.85;
+}
+
+.addBtn:disabled {
+    opacity: 0.3;
+    cursor: default;
+}
+
+.empty {
+    text-align: center;
+    padding: 16px;
+    color: var(--text-secondary, #666);
+    font-size: 0.8rem;
+}

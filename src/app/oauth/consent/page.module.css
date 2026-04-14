@@ -1,64 +1,130 @@
+/* ── Background ── */
 .container {
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    background: var(--bg-primary);
 }
 
+.container::before,
+.container::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.12;
+    pointer-events: none;
+    animation: orbFloat 14s ease-in-out infinite alternate;
+}
+
+.container::before {
+    width: 600px;
+    height: 600px;
+    background: var(--accent-color);
+    top: -15%;
+    left: -10%;
+}
+
+.container::after {
+    width: 500px;
+    height: 500px;
+    background: var(--accent-secondary);
+    bottom: -10%;
+    right: -10%;
+    animation-delay: -7s;
+    animation-direction: alternate-reverse;
+}
+
+@keyframes orbFloat {
+    0%   { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(60px, 40px) scale(1.15); }
+}
+
+/* ── Card ── */
 .card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
+    position: relative;
+    z-index: 1;
+    background: color-mix(in srgb, var(--bg-card) 80%, transparent);
+    backdrop-filter: blur(24px) saturate(1.4);
+    -webkit-backdrop-filter: blur(24px) saturate(1.4);
+    border: 1px solid color-mix(in srgb, var(--border-color) 60%, transparent);
     border-radius: var(--radius-lg);
-    padding: 2.5rem;
+    padding: 2.5rem 2.5rem 2rem;
     width: 100%;
-    max-width: 500px;
+    max-width: 480px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25);
+    animation: cardEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes cardEnter {
+    from { opacity: 0; transform: translateY(18px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ── Branding ── */
+.logo {
+    display: block;
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 1.25rem;
+    border-radius: 14px;
+    object-fit: cover;
 }
 
 .title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-bottom: 1.5rem;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 1.25rem;
     color: var(--text-primary);
     text-align: center;
+    letter-spacing: -0.02em;
 }
 
+/* ── Client info ── */
 .clientInfo {
-    margin-bottom: 2rem;
+    margin-bottom: 1.75rem;
     text-align: center;
 }
 
 .clientName {
-    font-size: 1.2rem;
+    font-size: 1.15rem;
     font-weight: 600;
     color: var(--text-primary);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.35rem;
 }
 
 .clientDescription {
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     color: var(--text-secondary);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.35rem;
 }
 
 .subtitle {
     color: var(--text-secondary);
-    font-size: 0.9rem;
+    font-size: 0.88rem;
+    line-height: 1.4;
 }
 
+/* ── Permissions ── */
 .permissions {
     background: var(--bg-primary);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-sm);
-    padding: 1.5rem;
+    padding: 1.25rem 1.5rem;
     margin-bottom: 1.5rem;
 }
 
 .permissions h3 {
-    font-size: 0.95rem;
+    font-size: 0.8rem;
     font-weight: 600;
-    margin-bottom: 1rem;
-    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
 
 .permissions ul {
@@ -68,8 +134,8 @@
 }
 
 .permissions li {
-    padding: 0.5rem 0;
-    color: var(--text-secondary);
+    padding: 0.45rem 0;
+    color: var(--text-primary);
     font-size: 0.9rem;
     display: flex;
     align-items: center;
@@ -80,44 +146,78 @@
     color: var(--accent-color);
     font-weight: bold;
     margin-right: 0.75rem;
-}
-
-.error {
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    color: #ef4444;
-    padding: 0.75rem;
-    border-radius: var(--radius-sm);
     font-size: 0.85rem;
-    margin-bottom: 1.5rem;
 }
 
+/* ── Error ── */
+.error {
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    color: #ef4444;
+    padding: 0.7rem 0.85rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.84rem;
+    margin-bottom: 1.5rem;
+    animation: shake 0.35s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%      { transform: translateX(-4px); }
+    40%      { transform: translateX(4px); }
+    60%      { transform: translateX(-3px); }
+    80%      { transform: translateX(2px); }
+}
+
+/* ── Buttons ── */
 .buttonGroup {
     display: flex;
     gap: 0.75rem;
-    margin-top: 1.5rem;
+    margin-top: 1.25rem;
 }
 
 .button {
+    position: relative;
     background: var(--accent-color);
     color: #fff;
     border: none;
-    padding: 0.85rem 1.5rem;
+    padding: 0.8rem 1.5rem;
     border-radius: var(--radius-sm);
-    font-size: 1rem;
-    font-weight: 500;
+    font-size: 0.95rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: opacity 0.2s;
     flex: 1;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.button::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.25s;
 }
 
 .button:hover {
-    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(212, 165, 116, 0.4);
+}
+
+.button:hover::after {
+    opacity: 1;
+}
+
+.button:active {
+    transform: translateY(0);
 }
 
 .button:disabled {
-    opacity: 0.6;
+    opacity: 0.55;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
 .buttonSecondary {
@@ -126,7 +226,39 @@
     border: 1px solid var(--border-color);
 }
 
+.buttonSecondary::after {
+    display: none;
+}
+
 .buttonSecondary:hover {
     background: var(--bg-hover);
-    opacity: 1;
+    border-color: var(--accent-color);
+    box-shadow: none;
+    transform: none;
+}
+
+/* ── Footer ── */
+.footer {
+    margin-top: 1.75rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid color-mix(in srgb, var(--border-color) 50%, transparent);
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+    text-align: center;
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+    .card {
+        padding: 2rem 1.5rem 1.5rem;
+        border-radius: var(--radius-md);
+    }
+
+    .buttonGroup {
+        flex-direction: column;
+    }
+
+    .container::before { width: 350px; height: 350px; }
+    .container::after  { width: 300px; height: 300px; }
 }

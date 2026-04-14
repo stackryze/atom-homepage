@@ -1,0 +1,118 @@
+.widget {
+    background: var(--bg-card, rgba(255, 255, 255, 0.03));
+    border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.06));
+    border-radius: var(--radius-lg, 16px);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.headerLeft {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary, #888);
+}
+
+.refreshBtn {
+    background: none;
+    border: none;
+    color: var(--text-secondary, #888);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    transition: all 0.15s ease;
+}
+
+.refreshBtn:hover {
+    color: var(--text-primary, #fff);
+    background: var(--bg-secondary, rgba(255, 255, 255, 0.05));
+}
+
+.loading, .empty {
+    padding: 1.5rem 0;
+    text-align: center;
+    color: var(--text-secondary, #888);
+    font-size: 0.75rem;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-height: 350px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+.entry {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.5rem 0.4rem;
+    border-radius: var(--radius-sm, 6px);
+    transition: background 0.1s ease;
+}
+
+.entry:hover {
+    background: var(--bg-secondary, rgba(255, 255, 255, 0.02));
+}
+
+.entryIcon {
+    flex-shrink: 0;
+    color: var(--text-secondary, #888);
+    opacity: 0.6;
+    margin-top: 1px;
+}
+
+.entryContent {
+    flex: 1;
+    min-width: 0;
+}
+
+.entryAction {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.72rem;
+}
+
+.username {
+    font-weight: 600;
+    color: var(--accent-color, #d4a574);
+}
+
+.action {
+    color: var(--text-secondary, #888);
+}
+
+.entryDetails {
+    font-size: 0.65rem;
+    color: var(--text-secondary, #888);
+    opacity: 0.7;
+    margin-top: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.entryTime {
+    flex-shrink: 0;
+    font-size: 0.6rem;
+    color: var(--text-secondary, #888);
+    opacity: 0.5;
+    margin-top: 2px;
+}

@@ -1,24 +1,37 @@
 'use client';
 
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { Search, Grid3X3, Grid2X2, List as ListIcon, ChevronRight, Edit2, Check } from 'lucide-react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent, DragOverlay, useDroppable } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 
 import ServiceCard from './ui/ServiceCard';
-import SystemStatsWidget from './widgets/SystemStats';
-import CustomWidget from './widgets/CustomWidget';
-import DockerWidget from './widgets/DockerWidget';
-import ShortcutsModal from './modals/ShortcutsModal';
-import ClockWidget from './widgets/ClockWidget';
 import { Widget } from '@/types';
 import { useStatus } from '@/context/StatusContext';
-import GenericWidget from './widgets/GenericWidget';
 import SortableWidget from './widgets/SortableWidget';
 import styles from './Dashboard.module.css';
-
 import { useConfig } from '@/context/ConfigContext';
+
+// Lazy-load heavy widget components — they're only needed when config has them
+const SystemStatsWidget = dynamic(() => import('./widgets/SystemStats'), { ssr: false });
+const CustomWidget = dynamic(() => import('./widgets/CustomWidget'));
+const DockerWidget = dynamic(() => import('./widgets/DockerWidget'), { ssr: false });
+const NotesWidget = dynamic(() => import('./widgets/NotesWidget'));
+const UptimeWidget = dynamic(() => import('./widgets/UptimeWidget'));
+const WeatherWidget = dynamic(() => import('./widgets/WeatherWidget'));
+const IframeWidget = dynamic(() => import('./widgets/IframeWidget'));
+const SearchWidget = dynamic(() => import('./widgets/SearchWidget'));
+const ActivityWidget = dynamic(() => import('./widgets/ActivityWidget'));
+const CalendarWidget = dynamic(() => import('./widgets/CalendarWidget'));
+const BookmarksWidget = dynamic(() => import('./widgets/BookmarksWidget'));
+const ClockWidget = dynamic(() => import('./widgets/ClockWidget'));
+const GenericWidget = dynamic(() => import('./widgets/GenericWidget'));
+
+// Lazy-load modals — only loaded when user triggers them
+const ShortcutsModal = dynamic(() => import('./modals/ShortcutsModal'));
+const CommandPalette = dynamic(() => import('./features/CommandPalette'));
 
 
 export default function Dashboard({ user }: { user?: { username: string; tags?: string[]; role?: string } }) {
@@ -26,6 +39,7 @@ export default function Dashboard({ user }: { user?: { username: string; tags?: 
     const [search, setSearch] = useState('');
     const [layout, setLayout] = useState<'list' | 'grid4' | 'grid6'>('grid6');
     const [showShortcuts, setShowShortcuts] = useState(false);
+    const [showCommandPalette, setShowCommandPalette] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const searchRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
@@ -33,6 +47,8 @@ export default function Dashboard({ user }: { user?: { username: string; tags?: 
 
     const [activeId, setActiveId] = useState<string | null>(null);
     const [localWidgets, setLocalWidgets] = useState<Widget[]>([]);
+    const [activePage, setActivePage] = useState<string>('all');
+    const [activeCategory, setActiveCategory] = useState<string>('all');
 
     useEffect(() => {
         if (config?.widgets) {
@@ -172,6 +188,13 @@ export default function Dashboard({ user }: { user?: { username: string; tags?: 
     // Keyboard shortcuts
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
+            // Command Palette: Ctrl+K or Cmd+K
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                setShowCommandPalette(prev => !prev);
+                return;
+            }
+
             // Ignore if typing in input
             if (e.target instanceof HTMLInputElement) return;
 
@@ -198,13 +221,24 @@ export default function Dashboard({ user }: { user?: { username: string; tags?: 
                     break;
                 case 'Escape':
                     setShowShortcuts(false);
+                    setShowCommandPalette(false);
                     break;
             }
         };
 
+        // Listen for custom events from command palette
+        const onRefreshEvent = () => refreshAll(config?.services || []);
+        const handleShowShortcuts = () => setShowShortcuts(true);
+
         window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [router, config, handleLayoutChange]);
+        window.addEventListener('atom:refresh-status', onRefreshEvent);
+        window.addEventListener('atom:show-shortcuts', handleShowShortcuts);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('atom:refresh-status', onRefreshEvent);
+            window.removeEventListener('atom:show-shortcuts', handleShowShortcuts);
+        };
+    }, [router, config, handleLayoutChange, refreshAll]);
 
 
     // Set initial layout from config
@@ -227,6 +261,57 @@ export default function Dashboard({ user }: { user?: { username: string; tags?: 
         await refreshAll(config.services);
     };
 
+    // All hooks must be above the early return to maintain consistent hook order
+    const userTags = useMemo(() => user?.tags || [], [user?.tags]);
+    const hasAllAccess = userTags.includes('all') || user?.role === 'admin';
+
+    const filteredServices = useMemo(() => {
+        if (!config) return [];
+        return config.services.filter(s => {
+            // Tag Access Control
+            if (!hasAllAccess) {
+                const serviceTags = s.tags || [];
+                if (serviceTags.length > 0) {
+                    const hasMatchingTag = serviceTags.some(t => userTags.includes(t));
+                    if (!hasMatchingTag) return false;
+                }
+            }
+
+            // Page filter
+            if (activePage !== 'all' && config.pages) {
+                const page = config.pages.find(p => p.id === activePage);
+                if (page && !page.services.includes(s.id)) return false;
+            }
+
+            // Category filter
+            if (activeCategory !== 'all') {
+                if ((s.category || 'Uncategorized') !== activeCategory) return false;
+            }
+
+            // Search Filter
+            return s.name.toLowerCase().includes(search.toLowerCase()) ||
+                s.url.toLowerCase().includes(search.toLowerCase());
+        });
+    }, [config, hasAllAccess, userTags, search, activePage, activeCategory]);
+
+    // Extract unique categories
+    const categories = useMemo(() => {
+        if (!config) return [];
+        const cats = new Set<string>();
+        config.services.forEach(s => {
+            if (s.category && s.category !== 'Bookmark') cats.add(s.category);
+        });
+        return Array.from(cats).sort();
+    }, [config]);
+
+    const filteredLinks = useMemo(() => {
+        if (!config) return [];
+        return config.links.filter(l =>
+            l.title.toLowerCase().includes(search.toLowerCase()) ||
+            l.url.toLowerCase().includes(search.toLowerCase())
+        );
+    }, [config, search]);
+
     if (loading || !config) return <div className={styles.loader}>Loading...</div>;
 
     const getGreeting = () => {
@@ -236,24 +321,6 @@ export default function Dashboard({ user }: { user?: { username: string; tags?: 
         return 'Good Evening';
     };
 
-    const userTags = user?.tags || [];
-    const hasAllAccess = userTags.includes('all') || user?.role === 'admin';
-
-    const filteredServices = config.services.filter(s => {
-        // Tag Access Control
-        if (!hasAllAccess) {
-            const serviceTags = s.tags || [];
-            if (serviceTags.length > 0) {
-                const hasMatchingTag = serviceTags.some(t => userTags.includes(t));
-                if (!hasMatchingTag) return false;
-            }
-        }
-
-        // Search Filter
-        return s.name.toLowerCase().includes(search.toLowerCase()) ||
-            s.url.toLowerCase().includes(search.toLowerCase());
-    });
-
     const getSearchUrl = (query: string) => {
         const searchEngines: { [key: string]: string } = {
             'Google': `https://www.google.com/search?q=${encodeURIComponent(query)}`,
@@ -262,11 +329,6 @@ export default function Dashboard({ user }: { user?: { username: string; tags?: 
         };
         return searchEngines[config.searchEngine || 'Google'] || searchEngines['Google'];
     };
-
-    const filteredLinks = config.links.filter(l =>
-        l.title.toLowerCase().includes(search.toLowerCase()) ||
-        l.url.toLowerCase().includes(search.toLowerCase())
-    );
 
     const hasResults = filteredServices.length > 0 || filteredLinks.length > 0;
 
@@ -310,6 +372,22 @@ export default function Dashboard({ user }: { user?: { username: string; tags?: 
                         />
                     )}
                     {widget.type === 'docker' && <DockerWidget />}
+                    {widget.type === 'notes' && <NotesWidget />}
+                    {widget.type === 'uptime' && <UptimeWidget />}
+                    {widget.type === 'weather' && <WeatherWidget location={config.weather?.location} />}
+                    {widget.type === 'iframe' && (
+                        <IframeWidget
+                            url={(widget.options as { url?: string })?.url || ''}
+                            height={(widget.options as { height?: number })?.height || 300}
+                            title={widget.title || 'Embed'}
+                        />
+                    )}
+                    {widget.type === 'search' && (
+                        <SearchWidget engine={(widget.options as { engine?: string })?.engine || config.searchEngine || 'google'} />
+                    )}
+                    {widget.type === 'activity' && <ActivityWidget />}
+                    {widget.type === 'calendar' && <CalendarWidget />}
+                    {widget.type === 'bookmarks' && <BookmarksWidget links={config.links || []} />}
                 </div>
             </SortableWidget>
         )
@@ -349,6 +427,49 @@ export default function Dashboard({ user }: { user?: { username: string; tags?: 
             </header>
 
             {showShortcuts && <ShortcutsModal onClose={() => setShowShortcuts(false)} />}
+            {showCommandPalette && <CommandPalette onClose={() => setShowCommandPalette(false)} />}
+
+            {/* Page Tabs */}
+            {config.pages && config.pages.length > 0 && (
+                <div className={styles.pageTabs}>
+                    <button
+                        className={`${styles.pageTab} ${activePage === 'all' ? styles.pageTabActive : ''}`}
+                        onClick={() => setActivePage('all')}
+                    >
+                        All
+                    </button>
+                    {config.pages.map(page => (
+                        <button
+                            key={page.id}
+                            className={`${styles.pageTab} ${activePage === page.id ? styles.pageTabActive : ''}`}
+                            onClick={() => setActivePage(page.id)}
+                        >
+                            {page.name}
+                        </button>
+                    ))}
+                </div>
+            )}
+
+            {/* Category Filter */}
+            {categories.length > 1 && (
+                <div className={styles.pageTabs}>
+                    <button
+                        className={`${styles.pageTab} ${activeCategory === 'all' ? styles.pageTabActive : ''}`}
+                        onClick={() => setActiveCategory('all')}
+                    >
+                        All Categories
+                    </button>
+                    {categories.map(cat => (
+                        <button
+                            key={cat}
+                            className={`${styles.pageTab} ${activeCategory === cat ? styles.pageTabActive : ''}`}
+                            onClick={() => setActiveCategory(cat)}
+                        >
+                            {cat}
+                        </button>
+                    ))}
+                </div>
+            )}
 
             {/* Search */}
             <div className={styles.searchBar}>
@@ -356,6 +477,7 @@ export default function Dashboard({ user }: { user?: { username: string; tags?: 
                 <input
                     ref={searchRef}
                     placeholder={`Search ${config.searchEngine || 'Google'}...`}
+                    aria-label={`Search services or ${config.searchEngine || 'Google'}`}
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                 />

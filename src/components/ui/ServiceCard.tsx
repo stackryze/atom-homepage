@@ -6,7 +6,7 @@ import { Box, ArrowUpRight } from 'lucide-react';
 import { Service } from '@/types';
 import { useStatus } from '@/context/StatusContext';
 import PingLoader from './PingLoader';
-import * as simpleIcons from 'simple-icons';
+import { getSimpleIcon } from '@/lib/icons';
 import styles from './ServiceCard.module.css';
 
 interface ServiceCardProps {
@@ -18,9 +18,7 @@ export default function ServiceCard({ service, compact = false }: ServiceCardPro
     let IconPath = null;
 
     if (service.icon) {
-        const slug = 'si' + service.icon.charAt(0).toUpperCase() + service.icon.slice(1);
-        // @ts-expect-error SimpleIcons indexing by string key
-        const iconData = simpleIcons[slug];
+        const iconData = getSimpleIcon(service.icon);
         if (iconData) {
             IconPath = iconData.path;
         }
@@ -66,7 +64,7 @@ export default function ServiceCard({ service, compact = false }: ServiceCardPro
                         {isActuallyLoading ? (
                             <PingLoader className={styles.statusLoader} />
                         ) : (
-                            <div className={`${styles.statusDot} ${styles[status.state]}`} title={`Status: ${status.state.toUpperCase()} ${status.code ? `(${status.code})` : ''} - ${status.latency}ms`} />
+                            <div className={`${styles.statusDot} ${styles[status.state]}`} title={`Status: ${status.state.toUpperCase()} ${status.code ? `(${status.code})` : ''} - ${status.latency}ms`} role="status" aria-label={`Service status: ${status.state}`} />
                         )}
                     </>
                 )}
@@ -75,7 +73,15 @@ export default function ServiceCard({ service, compact = false }: ServiceCardPro
                 <div className={styles.info}>
                     <div className={styles.nameRow}>
                         <span className={styles.name}>{service.name}</span>
+                        {!isActuallyLoading && status.state !== 'loading' && status.latency > 0 && service.category !== 'Bookmark' && (
+                            <span className={`${styles.latency} ${status.state === 'slow' ? styles.latencySlow : ''}`}>
+                                {status.latency}ms
+                            </span>
+                        )}
                     </div>
+                    {service.description && (
+                        <div className={styles.description}>{service.description}</div>
+                    )}
                     <div className={styles.url}>
                         {(status.state === 'down' && status.code > 0) ? (
                             <span className={styles.errorCode}>Err {status.code}</span>

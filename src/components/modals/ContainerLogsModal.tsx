@@ -79,7 +79,7 @@ export default function ContainerLogsModal({ containerId, containerName, onClose
     };
 
     return (
-        <div className={styles.overlay}>
+        <div className={styles.overlay} role="dialog" aria-modal="true" aria-label="Container Logs">
             <div className={styles.modal}>
                 <div className={styles.header}>
                     <div className={styles.title}>

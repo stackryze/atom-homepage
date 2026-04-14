@@ -102,8 +102,14 @@ export function validateClientCredentials(
     // For public clients, secret validation is skipped
     if (!client.is_confidential) return client;
 
-    // For confidential clients, validate secret
-    if (client.client_secret !== client_secret) {
+    // For confidential clients, validate secret using timing-safe comparison
+    try {
+        const a = Buffer.from(client.client_secret || '');
+        const b = Buffer.from(client_secret);
+        if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
+            return null;
+        }
+    } catch {
         return null;
     }
 

@@ -18,10 +18,13 @@ export default function SystemStatsWidget() {
     const [cpuHistory, setCpuHistory] = useState<number[]>(new Array(20).fill(0));
 
     useEffect(() => {
+        let mounted = true;
+        const controller = new AbortController();
+
         const fetchStats = async () => {
             try {
-                const res = await fetch('/api/stats');
-                if (res.ok) {
+                const res = await fetch('/api/stats', { signal: controller.signal });
+                if (res.ok && mounted) {
                     const data = await res.json();
                     setStats(data);
                     setCpuHistory(prev => {
@@ -30,13 +33,19 @@ export default function SystemStatsWidget() {
                     });
                 }
             } catch (e) {
-                console.error(e);
+                if (mounted && !(e instanceof DOMException && e.name === 'AbortError')) {
+                    console.error(e);
+                }
             }
         };
         fetchStats();
         // Update every 5 seconds as requested
         const interval = setInterval(fetchStats, 5000);
-        return () => clearInterval(interval);
+        return () => {
+            mounted = false;
+            controller.abort();
+            clearInterval(interval);
+        };
     }, []);
 
     // Generate SVG path for the graph
@@ -98,13 +107,17 @@ export default function SystemStatsWidget() {
                     <div className={styles.fill} style={{ width: `${(stats.memUsed / stats.memTotal) * 100}%` }} />
                 </div>
 
-                <div className={styles.memRow} style={{ marginTop: '0.5rem' }}>
-                    <span>Storage</span>
-                    <span className={styles.memValue}>{formatBytes(stats.storage[0].used)} / {formatBytes(stats.storage[0].size)}</span>
-                </div>
-                <div className={styles.progressBar}>
-                    <div className={styles.fill} style={{ width: `${(stats.storage[0].used / stats.storage[0].size) * 100}%`, opacity: 0.5 }} />
-                </div>
+                {stats.storage.length > 0 && (
+                    <>
+                        <div className={styles.memRow} style={{ marginTop: '0.5rem' }}>
+                            <span>Storage</span>
+                            <span className={styles.memValue}>{formatBytes(stats.storage[0].used)} / {formatBytes(stats.storage[0].size)}</span>
+                        </div>
+                        <div className={styles.progressBar}>
+                            <div className={styles.fill} style={{ width: `${(stats.storage[0].used / stats.storage[0].size) * 100}%`, opacity: 0.5 }} />
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );

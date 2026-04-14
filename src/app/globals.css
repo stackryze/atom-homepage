@@ -2,41 +2,62 @@
   --font-sans: var(--font-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
   /* Dark Theme (Default) */
-  --bg-primary: #111111;
+  --bg-primary: #0e0e0e;
   --bg-secondary: #141210;
-  --bg-card: #222222;
-  --bg-hover: #2a2a2a;
+  --bg-card: #1a1a1a;
+  --bg-hover: #252525;
+  --bg-elevated: #1f1f1f;
 
-  --text-primary: #ffffff;
+  --text-primary: #f0f0f0;
   --text-secondary: #a1a1aa;
   --text-muted: #52525b;
 
   --accent-color: #d4a574;
   --accent-secondary: #d4b896;
-  --border-color: #2a2420;
+  --accent-glow: rgba(212, 165, 116, 0.12);
+  --border-color: #222222;
   --border-accent: #8b6b43;
+  --border-subtle: rgba(255, 255, 255, 0.06);
 
   --radius-sm: 8px;
   --radius-md: 12px;
-  --radius-lg: 20px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.35);
+  --shadow-glow: 0 0 20px rgba(212, 165, 116, 0.08);
+
+  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Light Theme */
 [data-theme="light"] {
-  --bg-primary: #f5f5f5;
-  --bg-secondary: #ebebeb;
+  --bg-primary: #f5f5f3;
+  --bg-secondary: #eceae6;
   --bg-card: #ffffff;
-  --bg-hover: #e0e0e0;
+  --bg-hover: #f0ede8;
+  --bg-elevated: #ffffff;
 
   --text-primary: #1a1a1a;
   --text-secondary: #555555;
   --text-muted: #888888;
 
-  --border-color: #d0d0d0;
+  --border-color: #e0ddd8;
   --border-accent: #8b6b43;
+  --border-subtle: rgba(0, 0, 0, 0.06);
 
   --accent-color: #8b6b43;
   --accent-secondary: #a07850;
+  --accent-glow: rgba(139, 107, 67, 0.08);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.1);
+  --shadow-glow: 0 0 20px rgba(139, 107, 67, 0.06);
 }
 
 * {
@@ -50,10 +71,16 @@ body {
   max-width: 100vw;
   overflow-x: hidden;
   background-color: var(--bg-primary);
+  background-image: var(--bg-image, none);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
   color: var(--text-primary);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   scrollbar-gutter: stable;
+  letter-spacing: -0.01em;
 }
 
 a {

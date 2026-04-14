@@ -1,0 +1,120 @@
+.widget {
+    background: var(--bg-card, rgba(255, 255, 255, 0.03));
+    border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.06));
+    border-radius: var(--radius-lg, 16px);
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.searchRow {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--bg-secondary, rgba(255, 255, 255, 0.02));
+    border-radius: var(--radius-md, 10px);
+    padding: 0.35rem 0.5rem;
+    border: 1px solid transparent;
+    transition: border-color 0.15s ease;
+}
+
+.searchRow:focus-within {
+    border-color: var(--accent-color, #d4a574);
+}
+
+.engineBtn {
+    background: var(--accent-color, #d4a574);
+    color: #000;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: opacity 0.15s ease;
+}
+
+.engineBtn:hover {
+    opacity: 0.85;
+}
+
+.input {
+    flex: 1;
+    background: none;
+    border: none;
+    color: var(--text-primary, #fff);
+    font-size: 0.8rem;
+    outline: none;
+    min-width: 0;
+    font-family: var(--font-sans);
+}
+
+.input::placeholder {
+    color: var(--text-secondary, #888);
+    opacity: 0.5;
+}
+
+.searchBtn {
+    background: none;
+    border: none;
+    color: var(--text-secondary, #888);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+}
+
+.searchBtn:hover:not(:disabled) {
+    color: var(--accent-color, #d4a574);
+}
+
+.searchBtn:disabled {
+    opacity: 0.3;
+    cursor: default;
+}
+
+.engineGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+}
+
+.engineOption {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 0.5rem 0.25rem;
+    background: var(--bg-secondary, rgba(255, 255, 255, 0.02));
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm, 6px);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    color: var(--text-secondary, #888);
+}
+
+.engineOption:hover {
+    border-color: var(--border-subtle, rgba(255, 255, 255, 0.1));
+    color: var(--text-primary, #fff);
+}
+
+.engineOption.active {
+    border-color: var(--accent-color, #d4a574);
+    color: var(--accent-color, #d4a574);
+}
+
+.engineIcon {
+    font-weight: 700;
+    font-size: 0.7rem;
+}
+
+.engineName {
+    font-size: 0.55rem;
+    white-space: nowrap;
+}
