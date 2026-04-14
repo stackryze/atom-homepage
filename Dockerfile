@@ -35,8 +35,8 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Only install runtime deps (sqlite, curl for healthcheck)
-RUN apk add --no-cache sqlite-libs curl && \
+# Only install runtime deps (sqlite, curl for healthcheck, su-exec for entrypoint)
+RUN apk add --no-cache sqlite-libs curl su-exec && \
     addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
 
@@ -54,11 +54,14 @@ COPY --from=builder /app/src/lib/schema_features.sql ./src/lib/schema_features.s
 # Data directory with proper permissions
 RUN mkdir -p /app/data && chown -R nextjs:nodejs /app/data
 
+# Copy entrypoint
+COPY docker-entrypoint.sh /app/docker-entrypoint.sh
+RUN chmod +x /app/docker-entrypoint.sh
+
 ENV DATA_DIR="/app/data"
 VOLUME ["/app/data"]
 
-# Switch to non-root user
-USER nextjs
+# Run as root initially so entrypoint can fix volume permissions, then drops to nextjs
 
 EXPOSE 3000
 ENV PORT=3000
@@ -67,4 +70,4 @@ ENV HOSTNAME="0.0.0.0"
 HEALTHCHECK --interval=30s --timeout=3s --start-period=15s --retries=3 \
   CMD curl -f http://localhost:3000/api/health || exit 1
 
-CMD ["node", "server.js"]
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
