@@ -11,8 +11,8 @@ export default function CalendarWidget() {
     const currentMonth = date.getMonth();
     const currentYear = date.getFullYear();
 
-    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-    const firstDayOfWeek = new Date(currentYear, currentMonth, 1).getDay();
+    const daysInMonth = useMemo(() => new Date(currentYear, currentMonth + 1, 0).getDate(), [currentYear, currentMonth]);
+    const firstDayOfWeek = useMemo(() => new Date(currentYear, currentMonth, 1).getDay(), [currentYear, currentMonth]);
 
     const days = useMemo(() => {
         const result: (number | null)[] = [];

@@ -3,8 +3,8 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-    Search, Settings, Moon, Sun, Grid3X3, Grid2X2, List,
-    ExternalLink, Box, Terminal, RefreshCw, LogOut, Users,
+    Search, Settings, Moon, Sun,
+    ExternalLink, Box, RefreshCw, LogOut, Users,
     Shield, LayoutDashboard, Keyboard, ArrowUp, ArrowDown,
     CornerDownLeft, Zap, Globe
 } from 'lucide-react';

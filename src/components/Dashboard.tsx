@@ -262,7 +262,7 @@ export default function Dashboard({ user }: { user?: { username: string; tags?: 
     };
 
     // All hooks must be above the early return to maintain consistent hook order
-    const userTags = user?.tags || [];
+    const userTags = useMemo(() => user?.tags || [], [user?.tags]);
     const hasAllAccess = userTags.includes('all') || user?.role === 'admin';
 
     const filteredServices = useMemo(() => {

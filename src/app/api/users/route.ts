@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllUsersSafe, createUser, deleteUser, updateUserPassword, getUserById, getUserCount } from '@/lib/db';
+import { getAllUsersSafe, createUser, deleteUser, updateUserPassword, getUserById } from '@/lib/db';
 import { hashPassword, getCurrentUser } from '@/lib/auth';
 import { createUserSchema, changePasswordSchema } from '@/lib/validation';
 

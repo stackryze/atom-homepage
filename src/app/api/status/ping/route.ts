@@ -9,7 +9,7 @@ function isUnsafeHost(host: string): boolean {
     // Block IP-based hosts
     const ipMatch = host.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
     if (ipMatch) {
-        const [, a, b, c] = ipMatch.map(Number);
+        const [, a, b] = ipMatch.map(Number);
         if (a === 127) return true;                           // Loopback
         if (a === 10) return true;                            // Private Class A
         if (a === 172 && b >= 16 && b <= 31) return true;    // Private Class B
