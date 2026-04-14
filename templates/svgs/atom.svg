@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <!-- Nucleus -->
+  <circle cx="64" cy="64" r="10" fill="#d4a574"/>
+  <!-- Orbital 1 - horizontal ellipse -->
+  <ellipse cx="64" cy="64" rx="48" ry="18" stroke="#d4a574" stroke-width="3" fill="none" opacity="0.9"/>
+  <!-- Orbital 2 - rotated 60deg -->
+  <ellipse cx="64" cy="64" rx="48" ry="18" stroke="#d4a574" stroke-width="3" fill="none" opacity="0.9" transform="rotate(60 64 64)"/>
+  <!-- Orbital 3 - rotated -60deg -->
+  <ellipse cx="64" cy="64" rx="48" ry="18" stroke="#d4a574" stroke-width="3" fill="none" opacity="0.9" transform="rotate(-60 64 64)"/>
+  <!-- Electrons -->
+  <circle cx="112" cy="64" r="5" fill="#d4a574"/>
+  <circle cx="40" cy="22.3" r="5" fill="#d4a574"/>
+  <circle cx="40" cy="105.7" r="5" fill="#d4a574"/>
+</svg>
