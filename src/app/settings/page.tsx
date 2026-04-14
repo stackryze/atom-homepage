@@ -1,20 +1,23 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { ArrowLeft, Save, Upload, Download, Plus, Sun, Moon, Code, X, Lock, LogOut, Palette } from 'lucide-react';
 import { toast } from 'sonner';
 import { Service, Link as AppLink, Widget } from '@/types';
 import { useTheme } from '@/context/ThemeContext';
-import AddServiceModal from '@/components/modals/AddServiceModal';
-import AddWidgetModal from '@/components/modals/AddWidgetModal';
-import UserManagement from '@/components/ui/UserManagement';
-import ClientManager from '@/components/oauth/ClientManager';
-import AuthProviderManager from '@/components/oauth/AuthProviderManager';
-import EditableTable from '@/components/settings/EditableTable';
-import WidgetTable from '@/components/settings/WidgetTable';
 import { useConfig } from '@/context/ConfigContext';
 import styles from './page.module.css';
+
+// Lazy-load heavy section components — only rendered for active tab
+const AddServiceModal = dynamic(() => import('@/components/modals/AddServiceModal'));
+const AddWidgetModal = dynamic(() => import('@/components/modals/AddWidgetModal'));
+const UserManagement = dynamic(() => import('@/components/ui/UserManagement'));
+const ClientManager = dynamic(() => import('@/components/oauth/ClientManager'));
+const AuthProviderManager = dynamic(() => import('@/components/oauth/AuthProviderManager'));
+const EditableTable = dynamic(() => import('@/components/settings/EditableTable'));
+const WidgetTable = dynamic(() => import('@/components/settings/WidgetTable'));
 
 export default function SettingsPage() {
     const { theme, toggleTheme } = useTheme();

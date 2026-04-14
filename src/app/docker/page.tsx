@@ -1,13 +1,16 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import { ArrowLeft, Terminal, Play, Square, RotateCw, Code, Search, ChevronUp, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { DockerContainer } from '@/types';
-import ContainerLogsModal from '@/components/modals/ContainerLogsModal';
-import ContainerExecModal from '@/components/modals/ContainerExecModal';
 import styles from './page.module.css';
+
+// Lazy-load modals — xterm is heavy, only needed when user clicks
+const ContainerLogsModal = dynamic(() => import('@/components/modals/ContainerLogsModal'), { ssr: false });
+const ContainerExecModal = dynamic(() => import('@/components/modals/ContainerExecModal'), { ssr: false });
 
 export default function DockerDashboard() {
     const [containers, setContainers] = useState<DockerContainer[]>([]);

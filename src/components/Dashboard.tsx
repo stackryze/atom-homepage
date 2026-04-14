@@ -1,33 +1,37 @@
 'use client';
 
 import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { Search, Grid3X3, Grid2X2, List as ListIcon, ChevronRight, Edit2, Check } from 'lucide-react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent, DragOverlay, useDroppable } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 
 import ServiceCard from './ui/ServiceCard';
-import SystemStatsWidget from './widgets/SystemStats';
-import CustomWidget from './widgets/CustomWidget';
-import DockerWidget from './widgets/DockerWidget';
-import NotesWidget from './widgets/NotesWidget';
-import UptimeWidget from './widgets/UptimeWidget';
-import WeatherWidget from './widgets/WeatherWidget';
-import IframeWidget from './widgets/IframeWidget';
-import SearchWidget from './widgets/SearchWidget';
-import ActivityWidget from './widgets/ActivityWidget';
-import CalendarWidget from './widgets/CalendarWidget';
-import BookmarksWidget from './widgets/BookmarksWidget';
-import ShortcutsModal from './modals/ShortcutsModal';
-import CommandPalette from './features/CommandPalette';
-import ClockWidget from './widgets/ClockWidget';
 import { Widget } from '@/types';
 import { useStatus } from '@/context/StatusContext';
-import GenericWidget from './widgets/GenericWidget';
 import SortableWidget from './widgets/SortableWidget';
 import styles from './Dashboard.module.css';
-
 import { useConfig } from '@/context/ConfigContext';
+
+// Lazy-load heavy widget components — they're only needed when config has them
+const SystemStatsWidget = dynamic(() => import('./widgets/SystemStats'), { ssr: false });
+const CustomWidget = dynamic(() => import('./widgets/CustomWidget'));
+const DockerWidget = dynamic(() => import('./widgets/DockerWidget'), { ssr: false });
+const NotesWidget = dynamic(() => import('./widgets/NotesWidget'));
+const UptimeWidget = dynamic(() => import('./widgets/UptimeWidget'));
+const WeatherWidget = dynamic(() => import('./widgets/WeatherWidget'));
+const IframeWidget = dynamic(() => import('./widgets/IframeWidget'));
+const SearchWidget = dynamic(() => import('./widgets/SearchWidget'));
+const ActivityWidget = dynamic(() => import('./widgets/ActivityWidget'));
+const CalendarWidget = dynamic(() => import('./widgets/CalendarWidget'));
+const BookmarksWidget = dynamic(() => import('./widgets/BookmarksWidget'));
+const ClockWidget = dynamic(() => import('./widgets/ClockWidget'));
+const GenericWidget = dynamic(() => import('./widgets/GenericWidget'));
+
+// Lazy-load modals — only loaded when user triggers them
+const ShortcutsModal = dynamic(() => import('./modals/ShortcutsModal'));
+const CommandPalette = dynamic(() => import('./features/CommandPalette'));
 
 
 export default function Dashboard({ user }: { user?: { username: string; tags?: string[]; role?: string } }) {

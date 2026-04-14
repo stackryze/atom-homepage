@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import * as simpleIcons from 'simple-icons';
+import { getAllIcons } from '@/lib/icons';
 import { Search, X } from 'lucide-react';
 import styles from './IconPicker.module.css';
 
@@ -10,13 +10,7 @@ interface IconPickerProps {
     onClose: () => void;
 }
 
-// Convert the giant object to an array once
-const ALL_ICONS = Object.values(simpleIcons).map(icon => ({
-    title: icon.title,
-    slug: icon.slug,
-    path: icon.path,
-    hex: icon.hex
-}));
+const ALL_ICONS = getAllIcons();
 
 export default function IconPicker({ onSelect, onClose }: IconPickerProps) {
     const [query, setQuery] = useState('');

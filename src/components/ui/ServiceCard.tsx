@@ -6,7 +6,7 @@ import { Box, ArrowUpRight } from 'lucide-react';
 import { Service } from '@/types';
 import { useStatus } from '@/context/StatusContext';
 import PingLoader from './PingLoader';
-import * as simpleIcons from 'simple-icons';
+import { getSimpleIcon } from '@/lib/icons';
 import styles from './ServiceCard.module.css';
 
 interface ServiceCardProps {
@@ -18,9 +18,7 @@ export default function ServiceCard({ service, compact = false }: ServiceCardPro
     let IconPath = null;
 
     if (service.icon) {
-        const slug = 'si' + service.icon.charAt(0).toUpperCase() + service.icon.slice(1);
-        // @ts-expect-error SimpleIcons indexing by string key
-        const iconData = simpleIcons[slug];
+        const iconData = getSimpleIcon(service.icon);
         if (iconData) {
             IconPath = iconData.path;
         }

@@ -1,11 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { Sun, Moon, Settings, LogOut, Keyboard, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import styles from '../Dashboard.module.css';
-import NotificationCenter from '../features/NotificationCenter';
+
+const NotificationCenter = dynamic(() => import('../features/NotificationCenter'), { ssr: false });
 
 interface ClockWidgetProps {
     className?: string;

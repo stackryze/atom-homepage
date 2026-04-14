@@ -20,6 +20,14 @@ const globalWithDb = global as typeof globalThis & {
 if (!globalWithDb._db) {
     globalWithDb._db = new Database(DB_PATH);
     globalWithDb._preparedStmts = new Map();
+
+    // Performance pragmas — WAL mode, memory-mapped I/O, relaxed sync
+    globalWithDb._db.pragma('journal_mode = WAL');
+    globalWithDb._db.pragma('synchronous = NORMAL');
+    globalWithDb._db.pragma('cache_size = -64000'); // 64MB cache
+    globalWithDb._db.pragma('mmap_size = 268435456'); // 256MB memory-mapped I/O
+    globalWithDb._db.pragma('temp_store = MEMORY');
+    globalWithDb._db.pragma('busy_timeout = 5000');
 }
 
 const db = globalWithDb._db;
