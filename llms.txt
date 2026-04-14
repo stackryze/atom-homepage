@@ -1,0 +1,50 @@
+﻿#  | Atom Docs
+
+> A modern, self-hosted start page and service dashboard with real-time monitoring, Docker integration, SSO authentication, and customizable widgets.
+
+- [Atom Dashboard](https://stackryze.github.io/atom-homepage/index.md): Atom Dashboard
+- [Getting Started](https://stackryze.github.io/atom-homepage/getting-started/index.md): Everything you need to set up and run Atom Dashboard.
+- [Configuration](https://stackryze.github.io/atom-homepage/configuration/index.md): Atom is configured through the web UI. All settings are stored in the SQLite database.
+- [Widgets](https://stackryze.github.io/atom-homepage/widgets/index.md): Atom Dashboard supports a variety of built-in widgets to enhance your start page. Widgets can be placed in the left or right sidebar columns and reordered via drag-and-drop.
+- [Features](https://stackryze.github.io/atom-homepage/features/index.md): Explore Atom's feature set — from service monitoring to Docker management and SSO.
+- [API Reference](https://stackryze.github.io/atom-homepage/api/index.md): Atom exposes a RESTful API for all operations. All endpoints except onboarding require authentication via session cookie.
+- [Community](https://stackryze.github.io/atom-homepage/community/index.md): Atom is an open-source project and we welcome contributions from the community. Whether it's a new widget preset, a bug fix, documentation improvement, or a whole new feature — your contribution matters.
+- [Forward Auth Proxy with Atom OIDC](https://stackryze.github.io/atom-homepage/forward-auth-proxy-guide.md): This guide shows how to use Atom's OIDC as the SSO provider with oauth2-proxy as a standalone forward authentication proxy (similar to Authentik's proxy).
+- [Quick Setup Guide - oauth2-proxy with Atom](https://stackryze.github.io/atom-homepage/quick_setup.md): Atom dashboard running on http://atom:3000 (or your domain)
+
+## Getting Started
+
+- [Installation](https://stackryze.github.io/atom-homepage/getting-started/installation.md): Atom can be deployed using Docker (recommended) or run locally for development.
+
+## Configuration
+
+- [Dashboard Configuration](https://stackryze.github.io/atom-homepage/configuration/dashboard.md): The dashboard is the main view of Atom. Configure services, layout, pages, and categories.
+- [Appearance & Themes](https://stackryze.github.io/atom-homepage/configuration/appearance.md): Customize the look and feel of your Atom dashboard.
+
+## Widgets
+
+- [System Monitor Widget](https://stackryze.github.io/atom-homepage/widgets/system-monitor.md): Displays real-time system statistics including CPU usage, memory consumption, and storage information.
+- [Clock Widget](https://stackryze.github.io/atom-homepage/widgets/clock.md): A digital clock display with optional weather overlay, quick actions, and notification center access.
+- [Weather Widget](https://stackryze.github.io/atom-homepage/widgets/weather.md): Displays current weather conditions for a configured location.
+- [Docker Widget](https://stackryze.github.io/atom-homepage/widgets/docker.md): A compact summary widget showing Docker container counts and status.
+- [Calendar Widget](https://stackryze.github.io/atom-homepage/widgets/calendar.md): An interactive monthly calendar widget.
+- [Bookmarks Widget](https://stackryze.github.io/atom-homepage/widgets/bookmarks.md): A quick-access bookmark panel for frequently visited links.
+- [Notes Widget](https://stackryze.github.io/atom-homepage/widgets/notes.md): A persistent quick notes widget for jotting down reminders.
+- [Search Widget](https://stackryze.github.io/atom-homepage/widgets/search.md): An embedded search bar widget that searches using your configured search engine.
+- [Uptime Widget](https://stackryze.github.io/atom-homepage/widgets/uptime.md): Displays uptime history and response time graphs for a specific service.
+- [Activity Log Widget](https://stackryze.github.io/atom-homepage/widgets/activity.md): Shows recent service status changes and events.
+- [Iframe Widget](https://stackryze.github.io/atom-homepage/widgets/iframe.md): Embed any external webpage directly into your dashboard.
+- [Generic Widget](https://stackryze.github.io/atom-homepage/widgets/generic.md): A flexible widget that consumes any JSON API and displays mapped fields.
+- [Custom Widget](https://stackryze.github.io/atom-homepage/widgets/custom.md): A fully customizable widget for displaying any content.
+
+## Features
+
+- [Docker Integration](https://stackryze.github.io/atom-homepage/features/docker.md): Atom provides a full Docker management interface with real-time container stats.
+- [Status Monitoring](https://stackryze.github.io/atom-homepage/features/monitoring.md): Atom provides real-time uptime monitoring for all your services.
+- [SSO & Authentication](https://stackryze.github.io/atom-homepage/features/sso.md): Atom supports local authentication and external identity providers via OAuth2/OIDC and SAML 2.0.
+- [Forward Auth Proxy](https://stackryze.github.io/atom-homepage/features/forward-auth.md): Protect external applications using Atom as a forward authentication proxy.
+
+## Community
+
+- [Community Widgets](https://stackryze.github.io/atom-homepage/community/widgets.md): Community-contributed widget presets and configurations for popular self-hosted applications. These are ready-to-use configurations for the Generic Widget.
+- [Contributing to Atom](https://stackryze.github.io/atom-homepage/community/contributing.md): Thank you for your interest in contributing to Atom! This guide covers contributing to both the application code and the documentation.

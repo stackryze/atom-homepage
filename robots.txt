@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://stackryze.github.io/atom-homepage/sitemap.xml
