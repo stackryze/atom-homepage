@@ -3,7 +3,9 @@ name: Deploy Docs
 on:
   workflow_dispatch:
   push:
-    branches: [docs]
+    branches: [main]
+    paths:
+      - 'docs/**'
 
 permissions:
   contents: write
