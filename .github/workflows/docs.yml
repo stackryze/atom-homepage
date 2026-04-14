@@ -1,0 +1,26 @@
+name: Deploy Docs
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: retypeapp/action-build@latest
+        with:
+          config_path: docs/retype.yml
+
+      - uses: retypeapp/action-github-pages@latest
+        with:
+          update-branch: true

@@ -1,0 +1,37 @@
+input: .
+output: .retype
+
+url: stackryze.github.io/atom-homepage
+
+branding:
+  title: Atom
+  label: Docs
+
+links:
+  - text: GitHub
+    link: https://github.com/stackryze/atom-homepage
+    icon: mark-github
+    target: blank
+
+footer:
+  copyright: "&copy; Copyright {{ year }}. Atom Dashboard. All rights reserved."
+  links:
+    - text: License
+      link: https://github.com/stackryze/atom-homepage/blob/main/LICENSE.md
+    - text: Community
+      link: /community/
+
+edit:
+  repo: https://github.com/stackryze/atom-homepage/edit/
+  base: docs
+  label: Edit this page
+
+search:
+  hotkeys:
+    - "/"
+    - "k"
+
+favicon: static/favicon.png
+
+meta:
+  title: " | Atom Docs"
