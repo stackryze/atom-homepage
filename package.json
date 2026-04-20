@@ -42,7 +42,7 @@
         "next": "^16.2.3",
         "node-jose": "^2.2.0",
         "ping": "^1.0.0",
-        "react": "19.2.0",
+        "react": "19.2.4",
         "react-dom": "19.2.0",
         "samlify": "^2.10.2",
         "simple-icons": "^16.3.0",
