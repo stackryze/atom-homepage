@@ -32,7 +32,7 @@
         "@xterm/addon-fit": "^0.11.0",
         "@xterm/xterm": "^6.0.0",
         "bcryptjs": "^3.0.3",
-        "better-sqlite3": "^12.5.0",
+        "better-sqlite3": "^12.6.2",
         "clsx": "^2.1.1",
         "dockerode": "^4.0.9",
         "framer-motion": "^12.23.25",
